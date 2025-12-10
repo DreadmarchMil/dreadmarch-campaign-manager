@@ -168,6 +168,133 @@ function createSystemLabelsLayer(core) {
 }
 
 
+// DM4_CORE_FUNCTION: createGraticuleLayer
+
+function createGraticuleLayer(core) {
+  const svgNS = "http://www.w3.org/2000/svg";
+  const config = core.config || {};
+  const width = config.mapWidth || 4096;
+  const height = config.mapHeight || 4096;
+
+  const state = core.state;
+  const dataset = state.getState().dataset || {};
+  const galacticGrid = dataset.galactic_grid || {};
+
+  // Default values if galactic_grid is not defined
+  const cellSize = galacticGrid.cell_size || [1500, 1500];
+  const colOrigin = galacticGrid.col_origin || 17;
+  const rowOrigin = galacticGrid.row_origin || "N";
+
+  const cellWidth = cellSize[0];
+  const cellHeight = cellSize[1];
+
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.classList.add("dm-layer-graticule");
+  svg.setAttribute("width", width);
+  svg.setAttribute("height", height);
+  svg.setAttribute("viewBox", "0 0 " + width + " " + height);
+
+  // Helper function to convert column number to letter
+  function colNumberToLetter(num) {
+    // A=0, B=1, ... L=11, M=12, N=13, O=14, etc.
+    return String.fromCharCode(65 + num);
+  }
+
+  // Helper function to convert row letter to number for display
+  function rowLetterToNumber(letter) {
+    // Assuming rows are numbered, but stored as letters in origin
+    // Based on the dataset, row_origin is "N" and reference_cell.row is "N"
+    // which corresponds to a specific y-range. We'll use numeric row indices.
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return alphabet.indexOf(letter);
+  }
+
+  // Calculate grid boundaries based on the coordinate space
+  // The dataset spans columns L-O (11-14) and rows 16-19
+  // Starting from column L (11) at x=0
+  const startCol = 11; // L
+  const endCol = 15;   // O+1 for inclusive range
+  const startRow = 16;
+  const endRow = 20;   // 19+1 for inclusive range
+
+  // Calculate x positions for vertical lines (columns)
+  for (let col = startCol; col <= endCol; col++) {
+    const x = (col - startCol) * cellWidth;
+    const line = document.createElementNS(svgNS, "line");
+    line.setAttribute("x1", x);
+    line.setAttribute("y1", 0);
+    line.setAttribute("x2", x);
+    line.setAttribute("y2", height);
+    line.setAttribute("class", "dm-graticule-line dm-graticule-vertical");
+    svg.appendChild(line);
+
+    // Add column label at top and bottom
+    if (col < endCol) {
+      const colLetter = colNumberToLetter(col);
+      
+      // Top label
+      const labelTop = document.createElementNS(svgNS, "text");
+      labelTop.setAttribute("class", "dm-graticule-label");
+      labelTop.setAttribute("x", x + cellWidth / 2);
+      labelTop.setAttribute("y", 30);
+      labelTop.setAttribute("text-anchor", "middle");
+      labelTop.textContent = colLetter;
+      svg.appendChild(labelTop);
+
+      // Bottom label
+      const labelBottom = document.createElementNS(svgNS, "text");
+      labelBottom.setAttribute("class", "dm-graticule-label");
+      labelBottom.setAttribute("x", x + cellWidth / 2);
+      labelBottom.setAttribute("y", height - 15);
+      labelBottom.setAttribute("text-anchor", "middle");
+      labelBottom.textContent = colLetter;
+      svg.appendChild(labelBottom);
+    }
+  }
+
+  // Calculate y positions for horizontal lines (rows)
+  for (let row = startRow; row <= endRow; row++) {
+    const y = (row - startRow) * cellHeight;
+    const line = document.createElementNS(svgNS, "line");
+    line.setAttribute("x1", 0);
+    line.setAttribute("y1", y);
+    line.setAttribute("x2", width);
+    line.setAttribute("y2", y);
+    line.setAttribute("class", "dm-graticule-line dm-graticule-horizontal");
+    svg.appendChild(line);
+
+    // Add row label at left and right
+    if (row < endRow) {
+      // Left label
+      const labelLeft = document.createElementNS(svgNS, "text");
+      labelLeft.setAttribute("class", "dm-graticule-label");
+      labelLeft.setAttribute("x", 30);
+      labelLeft.setAttribute("y", y + cellHeight / 2);
+      labelLeft.setAttribute("text-anchor", "middle");
+      labelLeft.setAttribute("dominant-baseline", "middle");
+      labelLeft.textContent = row;
+      svg.appendChild(labelLeft);
+
+      // Right label
+      const labelRight = document.createElementNS(svgNS, "text");
+      labelRight.setAttribute("class", "dm-graticule-label");
+      labelRight.setAttribute("x", width - 30);
+      labelRight.setAttribute("y", y + cellHeight / 2);
+      labelRight.setAttribute("text-anchor", "middle");
+      labelRight.setAttribute("dominant-baseline", "middle");
+      labelRight.textContent = row;
+      svg.appendChild(labelRight);
+    }
+  }
+
+  return {
+    element: svg,
+    destroy: function () {
+      // No subscriptions to clean up
+    }
+  };
+}
+
 // DM4_CORE_FUNCTION: createRouteLayer
 
 
@@ -425,10 +552,12 @@ function initMapLayer(core, root) {
   const viewport = document.createElement("div");
   viewport.classList.add("dm-map-viewport");
 
+  const graticuleLayer = createGraticuleLayer(core);
   const routeLayer = createRouteLayer(core);
   const systemsLayer = createSystemMarkersLayer(core);
   const labelsLayer = createSystemLabelsLayer(core);
 
+  viewport.appendChild(graticuleLayer.element);
   viewport.appendChild(routeLayer.element);
   viewport.appendChild(systemsLayer.element);
   viewport.appendChild(labelsLayer.element);
@@ -718,6 +847,7 @@ function initMapLayer(core, root) {
 
   return {
     destroy: function () {
+      graticuleLayer.destroy();
       systemsLayer.destroy();
       routeLayer.destroy();
       labelsLayer.destroy();

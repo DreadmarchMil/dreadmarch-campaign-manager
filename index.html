@@ -133,12 +133,32 @@
       user-select: none;
     }
     .dm-layer-systems,
-    .dm-layer-routes {
+    .dm-layer-routes,
+    .dm-layer-graticule {
       position: absolute;
       width: 6000px;
       height: 6000px;
       top: 0;
       left: 0;
+    }
+    .dm-layer-graticule {
+      pointer-events: none;
+      z-index: 0;
+    }
+    .dm-graticule-line {
+      stroke: rgba(180, 120, 140, 0.15);
+      stroke-width: 1;
+      fill: none;
+      vector-effect: non-scaling-stroke;
+    }
+    .dm-graticule-label {
+      fill: rgba(180, 120, 140, 0.35);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      pointer-events: none;
+      user-select: none;
     }
     .dm-system-marker {
       position: absolute;
