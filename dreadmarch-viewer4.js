@@ -721,34 +721,30 @@ function createGraticuleLayer(core) {
   // The reference cell tells us which column/row corresponds to a specific region
   const refCell = galacticGrid.reference_cell || {};
   const refBounds = refCell.bounds || {};
+  const refCol = refCell.col || 17;
+  const refRow = refCell.row || "N";
   
-  // If we have reference bounds, use them to calculate the grid range
-  // Otherwise, default to columns L-O (11-14) and rows 16-19
-  let startCol, endCol, startRow, endRow;
+  // Calculate how many grid cells we need to cover the map
+  const numCellsX = Math.ceil(width / cellWidth);
+  const numCellsY = Math.ceil(height / cellHeight);
   
-  if (refBounds.x_min !== undefined && refBounds.x_max !== undefined) {
-    // Calculate column range based on cell size and bounds
-    startCol = Math.floor(refBounds.x_min / cellWidth);
-    endCol = Math.ceil(refBounds.x_max / cellWidth);
-  } else {
-    // Default: columns L-O (indices 11-14)
-    startCol = 11;
-    endCol = 15; // O+1 for inclusive range
-  }
+  // Calculate the grid index of the reference cell
+  // The reference cell bounds tell us which pixel range it occupies
+  const refCellIndexX = refBounds.x_min !== undefined ? Math.floor(refBounds.x_min / cellWidth) : 2;
+  const refCellIndexY = refBounds.y_min !== undefined ? Math.floor(refBounds.y_min / cellHeight) : 1;
   
-  if (refBounds.y_min !== undefined && refBounds.y_max !== undefined) {
-    // Calculate row range based on cell size and bounds
-    startRow = Math.floor(refBounds.y_min / cellHeight);
-    endRow = Math.ceil(refBounds.y_max / cellHeight);
-  } else {
-    // Default: rows 16-19
-    startRow = 16;
-    endRow = 20; // 19+1 for inclusive range
-  }
-
+  // Calculate the column/row name offset
+  // refCol is the column name (e.g., 17 for "N"), refCellIndexX is its grid index (e.g., 2)
+  const colNameOffset = refCol - refCellIndexX;
+  
+  // For rows, convert letter to number if needed (N = 13)
+  const refRowNum = typeof refRow === 'string' ? refRow.charCodeAt(0) - 65 : refRow;
+  const rowNameOffset = refRowNum - refCellIndexY;
+  
   // Calculate x positions for vertical lines (columns)
-  for (let col = startCol; col <= endCol; col++) {
-    const x = (col - startCol) * cellWidth;
+  // We need numCellsX+1 lines to create numCellsX cells
+  for (let gridIndex = 0; gridIndex <= numCellsX; gridIndex++) {
+    const x = gridIndex * cellWidth;
     const line = document.createElementNS(svgNS, "line");
     line.setAttribute("x1", x);
     line.setAttribute("y1", 0);
@@ -757,9 +753,10 @@ function createGraticuleLayer(core) {
     line.setAttribute("class", "dm-graticule-line dm-graticule-vertical");
     svg.appendChild(line);
 
-    // Add column label at top and bottom
-    if (col < endCol) {
-      const colLetter = colNumberToLetter(col);
+    // Add column label at top and bottom (for cells, not lines)
+    if (gridIndex < numCellsX) {
+      const colNum = gridIndex + colNameOffset;
+      const colLetter = colNumberToLetter(colNum);
       
       // Top label
       const labelTop = document.createElementNS(svgNS, "text");
@@ -782,8 +779,9 @@ function createGraticuleLayer(core) {
   }
 
   // Calculate y positions for horizontal lines (rows)
-  for (let row = startRow; row <= endRow; row++) {
-    const y = (row - startRow) * cellHeight;
+  // We need numCellsY+1 lines to create numCellsY cells
+  for (let gridIndex = 0; gridIndex <= numCellsY; gridIndex++) {
+    const y = gridIndex * cellHeight;
     const line = document.createElementNS(svgNS, "line");
     line.setAttribute("x1", 0);
     line.setAttribute("y1", y);
@@ -792,8 +790,11 @@ function createGraticuleLayer(core) {
     line.setAttribute("class", "dm-graticule-line dm-graticule-horizontal");
     svg.appendChild(line);
 
-    // Add row label at left and right
-    if (row < endRow) {
+    // Add row label at left and right (for cells, not lines)
+    if (gridIndex < numCellsY) {
+      const rowNum = gridIndex + rowNameOffset;
+      const rowLabel = colNumberToLetter(rowNum); // Using same function since rows are also letters
+      
       // Left label
       const labelLeft = document.createElementNS(svgNS, "text");
       labelLeft.setAttribute("class", "dm-graticule-label");
@@ -801,7 +802,7 @@ function createGraticuleLayer(core) {
       labelLeft.setAttribute("y", y + cellHeight / 2);
       labelLeft.setAttribute("text-anchor", "middle");
       labelLeft.setAttribute("dominant-baseline", "middle");
-      labelLeft.textContent = row;
+      labelLeft.textContent = rowLabel;
       svg.appendChild(labelLeft);
 
       // Right label
@@ -811,7 +812,7 @@ function createGraticuleLayer(core) {
       labelRight.setAttribute("y", y + cellHeight / 2);
       labelRight.setAttribute("text-anchor", "middle");
       labelRight.setAttribute("dominant-baseline", "middle");
-      labelRight.textContent = row;
+      labelRight.textContent = rowLabel;
       svg.appendChild(labelRight);
     }
   }
