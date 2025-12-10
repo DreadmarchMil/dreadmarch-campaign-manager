@@ -200,22 +200,34 @@ function createGraticuleLayer(core) {
     return String.fromCharCode(65 + num);
   }
 
-  // Helper function to convert row letter to number for display
-  function rowLetterToNumber(letter) {
-    // Assuming rows are numbered, but stored as letters in origin
-    // Based on the dataset, row_origin is "N" and reference_cell.row is "N"
-    // which corresponds to a specific y-range. We'll use numeric row indices.
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    return alphabet.indexOf(letter);
+  // Calculate grid boundaries from the galactic_grid configuration
+  // The reference cell tells us which column/row corresponds to a specific region
+  const refCell = galacticGrid.reference_cell || {};
+  const refBounds = refCell.bounds || {};
+  
+  // If we have reference bounds, use them to calculate the grid range
+  // Otherwise, default to columns L-O (11-14) and rows 16-19
+  let startCol, endCol, startRow, endRow;
+  
+  if (refBounds.x_min !== undefined && refBounds.x_max !== undefined) {
+    // Calculate column range based on cell size and bounds
+    startCol = Math.floor(refBounds.x_min / cellWidth);
+    endCol = Math.ceil(refBounds.x_max / cellWidth);
+  } else {
+    // Default: columns L-O (indices 11-14)
+    startCol = 11;
+    endCol = 15; // O+1 for inclusive range
   }
-
-  // Calculate grid boundaries based on the coordinate space
-  // The dataset spans columns L-O (11-14) and rows 16-19
-  // Starting from column L (11) at x=0
-  const startCol = 11; // L
-  const endCol = 15;   // O+1 for inclusive range
-  const startRow = 16;
-  const endRow = 20;   // 19+1 for inclusive range
+  
+  if (refBounds.y_min !== undefined && refBounds.y_max !== undefined) {
+    // Calculate row range based on cell size and bounds
+    startRow = Math.floor(refBounds.y_min / cellHeight);
+    endRow = Math.ceil(refBounds.y_max / cellHeight);
+  } else {
+    // Default: rows 16-19
+    startRow = 16;
+    endRow = 20; // 19+1 for inclusive range
+  }
 
   // Calculate x positions for vertical lines (columns)
   for (let col = startCol; col <= endCol; col++) {
