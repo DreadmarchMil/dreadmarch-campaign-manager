@@ -17,7 +17,7 @@
   const DM4_MODES = ["navcom", "strategic"];
   
   function isKnownMode(mode) {
-    return DM4_MODES.indexOf(mode) !== -1;
+    return DM4_MODES.includes(mode);
   }
 
   // DM4_CORE_FUNCTION: createStateManager
@@ -97,14 +97,15 @@
     function batchNotify(changeScope) {
       changeScope = changeScope || [];
       // Use simpler string key for better performance
-      const scopeKey = changeScope.join('.');
+      // Use special marker for empty scope to avoid empty string issues
+      const scopeKey = changeScope.length > 0 ? changeScope.join('.') : '__root__';
       batchedChanges.add(scopeKey);
       
       if (!notifyTimeout) {
         notifyTimeout = setTimeout(function () {
           // Process all batched changes
           const scopes = Array.from(batchedChanges).map(function (key) {
-            return key ? key.split('.') : [];
+            return key === '__root__' ? [] : key.split('.');
           });
           batchedChanges.clear();
           notifyTimeout = null;
