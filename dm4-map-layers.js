@@ -12,6 +12,64 @@
 /****************************************
    * 4) MAP: SYSTEM MARKERS & ROUTE LAYER
    ****************************************/
+  
+  // DM4_HELPER_FUNCTION: createSpatialIndex
+  // Simple grid-based spatial index for efficient viewport culling
+  // NOTE: This spatial index enables future viewport-based virtualization.
+  // When implemented, it will allow rendering only visible markers/labels
+  // by querying the index with the current viewport bounds.
+  // For datasets with 100+ systems, this provides significant performance gains.
+  function createSpatialIndex(systems, cellSize) {
+    const index = new Map();
+    const cellSize_ = cellSize || 512; // Default cell size
+    
+    Object.entries(systems).forEach(function ([id, sys]) {
+      const coords = sys.coords || [];
+      const x = coords[0];
+      const y = coords[1];
+      
+      if (typeof x !== "number" || typeof y !== "number") return;
+      
+      const cellX = Math.floor(x / cellSize_);
+      const cellY = Math.floor(y / cellSize_);
+      const cellKey = cellX + "," + cellY;
+      
+      if (!index.has(cellKey)) {
+        index.set(cellKey, []);
+      }
+      index.get(cellKey).push({ id: id, x: x, y: y, sys: sys });
+    });
+    
+    return {
+      cellSize: cellSize_,
+      index: index,
+      // Query systems within a bounding box
+      query: function(minX, minY, maxX, maxY) {
+        const results = [];
+        const cellMinX = Math.floor(minX / cellSize_);
+        const cellMinY = Math.floor(minY / cellSize_);
+        const cellMaxX = Math.floor(maxX / cellSize_);
+        const cellMaxY = Math.floor(maxY / cellSize_);
+        
+        for (let cx = cellMinX; cx <= cellMaxX; cx++) {
+          for (let cy = cellMinY; cy <= cellMaxY; cy++) {
+            const cellKey = cx + "," + cy;
+            const cell = index.get(cellKey);
+            if (cell) {
+              cell.forEach(function(item) {
+                if (item.x >= minX && item.x <= maxX && 
+                    item.y >= minY && item.y <= maxY) {
+                  results.push(item);
+                }
+              });
+            }
+          }
+        }
+        return results;
+      }
+    };
+  }
+  
   // DM4_CORE_FUNCTION: createSystemMarkersLayer
   function createSystemMarkersLayer(core) {
     const state = core.state;
@@ -785,10 +843,15 @@ function initMapLayer(core, root) {
 
 
 
-  // Expose map initializer on DM4 namespace
+  // Expose map initializer and utilities on DM4 namespace
   if (typeof initMapLayer === "function") {
     DM4.map.initMapLayer = initMapLayer;
   } else {
     console.error("[DREADMARCH][MAP] initMapLayer is not defined in dm4-map-layers.js.");
+  }
+  
+  // Expose spatial index for future virtualization features
+  if (typeof createSpatialIndex === "function") {
+    DM4.map.createSpatialIndex = createSpatialIndex;
   }
 })(); 
