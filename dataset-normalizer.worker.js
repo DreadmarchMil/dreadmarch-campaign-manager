@@ -3,6 +3,16 @@
  * 
  * Offloads dataset normalization to a separate thread to improve performance
  * for large datasets.
+ * 
+ * NOTE: This file contains duplicated normalization logic from dm4-dataset-core.js.
+ * This is intentional because:
+ * 1. Web Workers in browsers cannot easily import ES modules or shared scripts
+ * 2. The worker needs to be self-contained for deployment simplicity
+ * 3. The normalization logic is stable and rarely changes
+ * 
+ * If you modify the normalization algorithm, update BOTH files:
+ * - dm4-dataset-core.js (normalizeDatasetSync function)
+ * - dataset-normalizer.worker.js (normalizeDataset function)
  */
 
 self.addEventListener('message', function(event) {

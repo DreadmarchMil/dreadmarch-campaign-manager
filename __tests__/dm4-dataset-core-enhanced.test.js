@@ -80,6 +80,30 @@ describe('DM4 Dataset Core - Enhanced Features', () => {
       expect(DM4.dataset.getCacheStats().size).toBe(0);
     });
 
+    test('should support includeKeys option in getCacheStats', () => {
+      const dataset1 = {
+        systems: { 'sol': { name: 'Sol' } }
+      };
+      const dataset2 = {
+        systems: { 'alpha': { name: 'Alpha' } }
+      };
+
+      DM4.dataset.normalize(dataset1);
+      DM4.dataset.normalize(dataset2);
+
+      // Default: no keys
+      const statsDefault = DM4.dataset.getCacheStats();
+      expect(statsDefault.size).toBe(2);
+      expect(statsDefault.keys).toBeUndefined();
+
+      // With includeKeys: true
+      const statsWithKeys = DM4.dataset.getCacheStats({ includeKeys: true });
+      expect(statsWithKeys.size).toBe(2);
+      expect(statsWithKeys.keys).toBeDefined();
+      expect(Array.isArray(statsWithKeys.keys)).toBe(true);
+      expect(statsWithKeys.keys.length).toBe(2);
+    });
+
     test('should handle cache for datasets with additional properties', () => {
       const dataset1 = {
         systems: { 'sol': { name: 'Sol' } },

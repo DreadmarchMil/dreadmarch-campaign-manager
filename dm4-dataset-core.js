@@ -27,17 +27,33 @@
   var worker = null;
   var workerRequestId = 0;
   var pendingRequests = new Map();
+  
+  // Constants
+  var WORKER_TIMEOUT_MS = 5000;
 
   /**
    * Generate cache key from raw dataset structure
+   * Uses a fingerprint approach for efficiency instead of full JSON.stringify
    */
   function generateCacheKey(raw) {
     try {
-      // Use JSON.stringify for a complete representation
-      // This ensures different datasets with same structure but different data get different keys
-      return JSON.stringify(raw);
+      // Create a fingerprint based on dataset structure, not full content
+      var systemCount = raw.systems ? Object.keys(raw.systems).length : 0;
+      var pixelCount = (raw.system_pixels || raw.endpoint_pixels) ? 
+        Object.keys(raw.system_pixels || raw.endpoint_pixels).length : 0;
+      var gridCount = raw.system_grid ? Object.keys(raw.system_grid).length : 0;
+      var sectorCount = raw.sectors ? Object.keys(raw.sectors).length : 0;
+      
+      // For small datasets, use full JSON; for large ones, use fingerprint
+      if (systemCount < 100) {
+        return JSON.stringify(raw);
+      }
+      
+      // For large datasets, create a fingerprint
+      var systemIds = raw.systems ? Object.keys(raw.systems).sort().slice(0, 10).join(',') : '';
+      return [systemCount, pixelCount, gridCount, sectorCount, systemIds].join('|');
     } catch (e) {
-      // If stringify fails (circular references, etc), don't cache
+      // If fingerprint fails, don't cache
       return null;
     }
   }
@@ -93,6 +109,9 @@
 
   /**
    * Synchronous normalization (fallback)
+   * 
+   * NOTE: This logic is duplicated in dataset-normalizer.worker.js for Web Worker execution.
+   * Keep both implementations in sync when making changes to the normalization algorithm.
    */
   function normalizeDatasetSync(raw) {
     if (!raw || typeof raw !== "object") {
@@ -247,7 +266,7 @@
             reject(e);
           }
         }
-      }, 5000); // 5 second timeout
+      }, WORKER_TIMEOUT_MS);
     });
   }
 
@@ -293,12 +312,20 @@
 
   /**
    * Get cache statistics
+   * @param {Object} options - Options object
+   * @param {boolean} options.includeKeys - Whether to include all cache keys (default: false)
    */
-  function getCacheStats() {
-    return {
-      size: normalizationCache.size,
-      keys: Array.from(normalizationCache.keys())
+  function getCacheStats(options) {
+    options = options || {};
+    var stats = {
+      size: normalizationCache.size
     };
+    
+    if (options.includeKeys) {
+      stats.keys = Array.from(normalizationCache.keys());
+    }
+    
+    return stats;
   }
 
   if (!DM4.dataset) {
