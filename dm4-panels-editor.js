@@ -140,7 +140,7 @@
           URL.revokeObjectURL(url);
         }, 0);
       } catch (e) {
-        console.error("[DREADMARCH][EDITOR] Failed to export jobs:", e);
+        DM4.Logger.error("[EDITOR] Failed to export jobs:", e);
       }
     }
 
@@ -343,7 +343,7 @@ function EditorPanel(core) {
           URL.revokeObjectURL(url);
         }, 0);
       } catch (e) {
-        console.error("[DREADMARCH][EDITOR] Failed to export jobs:", e);
+        DM4.Logger.error("[EDITOR] Failed to export jobs:", e);
       }
     }
 
@@ -476,8 +476,8 @@ function EditorPanel(core) {
           ) {
             state.actions.addEditorJob(job);
           } else {
-            console.warn(
-              "[DREADMARCH][EDITOR] addEditorJob action not available; job not recorded."
+            DM4.Logger.warn(
+              "[EDITOR] addEditorJob action not available; job not recorded."
             );
           }
         });
@@ -564,7 +564,7 @@ function EditorPanel(core) {
           try {
             db5 = JSON.parse(JSON.stringify(currentDb5));
           } catch (e) {
-            console.error("[DREADMARCH][EDITOR] Failed to clone dataset for patch:", e);
+            DM4.Logger.error("[EDITOR] Failed to clone dataset for patch:", e);
             alert("Failed to clone dataset for patch. See console for details.");
             return;
           }
@@ -573,7 +573,7 @@ function EditorPanel(core) {
           try {
             logs = dm4ApplyJobsToDb5(db5, jobs, datasetId, true);
           } catch (e) {
-            console.error("[DREADMARCH][EDITOR] Patch failed:", e);
+            DM4.Logger.error("[EDITOR] Patch failed:", e);
             alert("Patch failed: " + (e && e.message ? e.message : String(e)));
             return;
           }
@@ -593,7 +593,7 @@ function EditorPanel(core) {
               window.DM4_DATASETS[datasetId] = db5;
             }
           } catch (e) {
-            console.warn("[DREADMARCH][EDITOR] Failed to update DM4_DATASETS cache:", e);
+            DM4.Logger.warn("[EDITOR] Failed to update DM4_DATASETS cache:", e);
           }
 
           // Clear editor jobs after successful patch
@@ -620,13 +620,13 @@ function EditorPanel(core) {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
           } catch (e) {
-            console.error("[DREADMARCH][EDITOR] Failed to download patched DB5:", e);
+            DM4.Logger.error("[EDITOR] Failed to download patched DB5:", e);
           }
 
           if (logs && logs.length) {
-            console.log("[DREADMARCH][EDITOR] Patch applied. Summary:");
+            DM4.Logger.log("[EDITOR] Patch applied. Summary:");
             for (var i = 0; i < logs.length; i++) {
-              console.log("  " + logs[i]);
+              DM4.Logger.log("  " + logs[i]);
             }
           }
         });

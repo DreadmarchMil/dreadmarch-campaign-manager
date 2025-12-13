@@ -61,7 +61,7 @@
       });
 
       cmdBtn.addEventListener("click", function () {
-        console.log("[DREADMARCH] Command Interface test hook — activating TEST PANEL.");
+        DM4.Logger.log("Command Interface test hook — activating TEST PANEL.");
         panelRegistry.activatePanel("test");
       });
 
