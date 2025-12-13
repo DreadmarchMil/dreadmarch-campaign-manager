@@ -96,22 +96,33 @@
     // Queues a scope change and delays notification to batch multiple updates
     function batchNotify(changeScope) {
       changeScope = changeScope || [];
-      // Store scope as a string to enable Set deduplication
-      const scopeKey = JSON.stringify(changeScope);
+      // Use simpler string key for better performance
+      const scopeKey = changeScope.join('.');
       batchedChanges.add(scopeKey);
       
       if (!notifyTimeout) {
         notifyTimeout = setTimeout(function () {
           // Process all batched changes
           const scopes = Array.from(batchedChanges).map(function (key) {
-            return JSON.parse(key);
+            return key ? key.split('.') : [];
           });
           batchedChanges.clear();
           notifyTimeout = null;
           
-          // Notify subscribers for each unique scope
+          // Collect all subscribers that need notification (deduped by function reference)
+          const subscribersToNotify = new Set();
           scopes.forEach(function (scope) {
-            notifySubscribers(scope);
+            subscribers.forEach(function (subscriber) {
+              if (scopeApplies(subscriber.scopePath, scope)) {
+                subscribersToNotify.add(subscriber);
+              }
+            });
+          });
+          
+          // Notify each subscriber only once with current state
+          const snapshot = state;
+          subscribersToNotify.forEach(function (subscriber) {
+            subscriber.fn(snapshot);
           });
         }, 10); // 10ms delay for batching
       }

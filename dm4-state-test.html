@@ -146,9 +146,9 @@
       log('Calls batched during synchronous execution: ' + (callCount === initialCount), callCount === initialCount);
       
       setTimeout(function() {
-        // Should have batched the changes (1 initial + 2 unique scopes: mode and selection)
-        // The two mode changes are deduped into one
-        log('Total calls after batch: ' + callCount + ' (expected 3)', callCount === 3);
+        // Should have batched the changes (1 initial + 1 batched notification)
+        // All changes are aggregated into a single notification per subscriber
+        log('Total calls after batch: ' + callCount + ' (expected 2)', callCount === 2);
         unsub();
       }, 50);
     }, 300);
