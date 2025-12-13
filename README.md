@@ -8,7 +8,7 @@ A campaign manager app for tabletop RPGs, designed to assist Game Masters (GMs) 
 - **Key-Based Access Control**: Define user roles for dynamically adjusted permissions
 - **Asset Management System**: Tools for tracking, buying, and requesting assets tied to the game world
 - **State Management**: Centralized state management with subscription-based updates
-- **Dataset Normalization**: Robust handling of galactic system data
+- **Dataset Normalization**: Robust handling of galactic system data with caching and Web Worker support
 
 ## Development
 
@@ -69,6 +69,10 @@ Current test coverage includes:
   - Editor state management
   - State immutability
 
+## API Documentation
+
+- **[Dataset Normalization API](DATASET_NORMALIZATION_API.md)**: Comprehensive guide to the enhanced dataset normalization system including caching, Web Worker support, and error handling
+
 ### Writing Tests
 
 When adding new features:
@@ -102,11 +106,14 @@ describe('My Module', () => {
 ```
 .
 ├── __tests__/              # Test files
-├── dm4-dataset-core.js     # Dataset normalization module
+├── dm4-dataset-core.js     # Dataset normalization module (with caching & Web Worker)
+├── dataset-normalizer.worker.js  # Web Worker for async normalization
+├── dm4-logger.js           # Centralized logging utility
 ├── dm4-state.js            # State management module
 ├── dm4-map-layers.js       # Map layer rendering
 ├── dm4-panels-*.js         # UI panel components
 ├── index.html              # Main application entry point
+├── DATASET_NORMALIZATION_API.md  # API documentation for dataset normalization
 └── package.json            # Project configuration and dependencies
 ```
 
