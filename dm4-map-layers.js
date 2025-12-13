@@ -133,19 +133,19 @@
 
     // DM4_HELPER_FUNCTION: renderSelection
     // Memoized: only updates when selection actually changes
-    let lastSelectedId = null;
+    let lastSelectedMarkerId = null;
 
     function renderSelection(st) {
       const selected = (st.selection && st.selection.system) || null;
       
       // Skip render if selection hasn't changed (memoization)
-      if (selected === lastSelectedId) {
+      if (selected === lastSelectedMarkerId) {
         return;
       }
       
       // Update previous selection marker
-      if (lastSelectedId && markerById.has(lastSelectedId)) {
-        markerById.get(lastSelectedId).classList.remove("dm-system-selected");
+      if (lastSelectedMarkerId && markerById.has(lastSelectedMarkerId)) {
+        markerById.get(lastSelectedMarkerId).classList.remove("dm-system-selected");
       }
       
       // Update new selection marker
@@ -153,7 +153,7 @@
         markerById.get(selected).classList.add("dm-system-selected");
       }
       
-      lastSelectedId = selected;
+      lastSelectedMarkerId = selected;
     }
 
     buildMarkers(core.state.getState().dataset);
@@ -222,19 +222,19 @@ function createSystemLabelsLayer(core) {
 
   // DM4_HELPER_FUNCTION: renderSelection
   // Memoized: only updates when selection actually changes
-  let lastSelectedId = null;
+  let lastSelectedLabelId = null;
 
   function renderSelection(st) {
     const selected = (st.selection && st.selection.system) || null;
     
     // Skip render if selection hasn't changed (memoization)
-    if (selected === lastSelectedId) {
+    if (selected === lastSelectedLabelId) {
       return;
     }
     
     // Update previous selection label
-    if (lastSelectedId && labelById.has(lastSelectedId)) {
-      labelById.get(lastSelectedId).classList.remove("dm-system-label-selected");
+    if (lastSelectedLabelId && labelById.has(lastSelectedLabelId)) {
+      labelById.get(lastSelectedLabelId).classList.remove("dm-system-label-selected");
     }
     
     // Update new selection label
@@ -242,7 +242,7 @@ function createSystemLabelsLayer(core) {
       labelById.get(selected).classList.add("dm-system-label-selected");
     }
     
-    lastSelectedId = selected;
+    lastSelectedLabelId = selected;
   }
 
   buildLabels(state.getState().dataset);
@@ -472,14 +472,14 @@ function createRouteLayer(core) {
 
   // DM4_HELPER_FUNCTION: renderSelection
   // Memoized: only updates when selection actually changes
-  let lastSelectedId = null;
+  let lastSelectedRouteId = null;
   let lastSelectedLines = [];
 
   function renderSelection(st) {
     const selected = (st.selection && st.selection.system) || null;
     
     // Skip render if selection hasn't changed (memoization)
-    if (selected === lastSelectedId) {
+    if (selected === lastSelectedRouteId) {
       return;
     }
 
@@ -490,13 +490,13 @@ function createRouteLayer(core) {
     lastSelectedLines = [];
 
     if (!selected) {
-      lastSelectedId = null;
+      lastSelectedRouteId = null;
       return;
     }
 
     const list = linesBySystem.get(selected);
     if (!list || !list.length) {
-      lastSelectedId = selected;
+      lastSelectedRouteId = selected;
       return;
     }
 
@@ -506,7 +506,7 @@ function createRouteLayer(core) {
       lastSelectedLines.push(line);
     });
     
-    lastSelectedId = selected;
+    lastSelectedRouteId = selected;
   }
 
   // Use scoped subscription - only listen to selection changes

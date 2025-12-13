@@ -382,7 +382,7 @@
       } else {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(function() {
-          lastCall = now;
+          lastCall = Date.now(); // Use current time at execution, not cached 'now'
           fn.apply(context, args);
         }, delay - (now - lastCall));
       }
