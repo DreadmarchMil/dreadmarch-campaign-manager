@@ -49,8 +49,8 @@ const DM4_PANELS = {
     try {
       const expectedRootClass = "dm4-" + id + "-root";
       if (!root.classList.contains(expectedRootClass)) {
-        console.warn(
-          "[DREADMARCH][PANEL] Panel '" + id + "' root missing expected class:",
+        DM4.Logger.warn(
+          "[PANEL] Panel '" + id + "' root missing expected class:",
           expectedRootClass,
           "on",
           root
@@ -60,15 +60,15 @@ const DM4_PANELS = {
       // Titles should use dm-text-title
       root.querySelectorAll("h1, h2, .dm4-" + id + "-title").forEach(function (el) {
         if (!el.classList.contains("dm-text-title")) {
-          console.warn("[DREADMARCH][PANEL] Panel '" + id + "' title without dm-text-title:", el);
+          DM4.Logger.warn("[PANEL] Panel '" + id + "' title without dm-text-title:", el);
         }
       });
 
       // Section headers should use dm-text-header
       root.querySelectorAll("[class*='-section-title']").forEach(function (el) {
         if (!el.classList.contains("dm-text-header")) {
-          console.warn(
-            "[DREADMARCH][PANEL] Panel '" + id + "' section header missing dm-text-header:",
+          DM4.Logger.warn(
+            "[PANEL] Panel '" + id + "' section header missing dm-text-header:",
             el
           );
         }
@@ -81,14 +81,14 @@ const DM4_PANELS = {
           !el.classList.contains("dm-text-header") &&
           !el.classList.contains("dm-text-title")
         ) {
-          console.warn(
-            "[DREADMARCH][PANEL] Panel '" + id + "' line missing any text role class:",
+          DM4.Logger.warn(
+            "[PANEL] Panel '" + id + "' line missing any text role class:",
             el
           );
         }
       });
     } catch (err) {
-      console.error("[DREADMARCH][PANEL] Failed panel contract check for '" + id + "':", err);
+      DM4.Logger.error("[PANEL] Failed panel contract check for '" + id + "':", err);
     }
   }
 
@@ -108,7 +108,7 @@ function isKnownPanel(id) {
     return Object.prototype.hasOwnProperty.call(cfg, id);
   } catch (err) {
     if (typeof DM4_DEBUG !== "undefined" && DM4_DEBUG) {
-      console.warn("[DREADMARCH][PANEL] isKnownPanel check failed for id '" + id + "':", err);
+      DM4.Logger.warn("[PANEL] isKnownPanel check failed for id '" + id + "':", err);
     }
     return false;
   }
@@ -137,13 +137,13 @@ function isKnownPanel(id) {
 
       const factory = factories[id];
       if (!factory) {
-        console.warn("[DREADMARCH][PANEL] Unknown panel id:", id);
+        DM4.Logger.warn("[PANEL] Unknown panel id:", id);
         return;
       }
 
       if (!isKnownPanel(id) && DM4_DEBUG) {
-        console.warn(
-          "[DREADMARCH][PANEL] Activating non-core or legacy panel id (not in DM4_PANELS):",
+        DM4.Logger.warn(
+          "[PANEL] Activating non-core or legacy panel id (not in DM4_PANELS):",
           id
         );
       }
@@ -163,8 +163,8 @@ function isKnownPanel(id) {
     return {
       registerPanel: function (id, factory) {
         if (DM4_DEBUG) {
-          console.warn(
-            "[DREADMARCH][PANEL] registerPanel used for id '" +
+          DM4.Logger.warn(
+            "[PANEL] registerPanel used for id '" +
               id +
               "'. Prefer adding panels via DM4_PANELS for canonical registry."
           );
@@ -182,7 +182,7 @@ function isKnownPanel(id) {
   if (typeof createPanelRegistry === "function") {
     DM4.panels.registry.createPanelRegistry = createPanelRegistry;
   } else {
-    console.error("[DREADMARCH][PANELS] createPanelRegistry is not defined in dm4-panels-registry.js.");
+    DM4.Logger.error("[PANELS] createPanelRegistry is not defined in dm4-panels-registry.js.");
   }
   DM4.panels.registry.config = DM4_PANELS;
 })(); 

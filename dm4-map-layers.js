@@ -39,7 +39,7 @@
         const y = coords[1];
 
         if (typeof x !== "number" || typeof y !== "number") {
-          console.warn("[DREADMARCH] Missing coords for system:", id);
+          DM4.Logger.warn("Missing coords for system:", id);
           return;
         }
 
@@ -63,7 +63,7 @@
               core.panelRegistry.activatePanel("editor");
             }
           } catch (err) {
-            console.warn("[DREADMARCH][EDITOR] Failed to activate editor panel on system click:", err);
+            DM4.Logger.warn("[EDITOR] Failed to activate editor panel on system click:", err);
           }
         });
 
@@ -120,7 +120,7 @@ function createSystemLabelsLayer(core) {
       const y = coords[1];
 
       if (typeof x !== "number" || typeof y !== "number") {
-        console.warn("[DREADMARCH] Missing coords for system (label):", id);
+        DM4.Logger.warn("Missing coords for system (label):", id);
         return;
       }
 
@@ -240,7 +240,7 @@ function createRouteLayer(core) {
     if (endpoints && Array.isArray(endpoints[id])) {
       return endpoints[id];
     }
-    console.warn("[DREADMARCH] Missing coords for route endpoint:", id);
+    DM4.Logger.warn("Missing coords for route endpoint:", id);
     return null;
   }
 
@@ -671,7 +671,7 @@ function initMapLayer(core, root) {
 
       if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(coordText).catch(function (err) {
-          console.warn("[DREADMARCH] Clipboard write failed:", err);
+          DM4.Logger.warn("Clipboard write failed:", err);
         });
       }
 
@@ -735,6 +735,6 @@ function initMapLayer(core, root) {
   if (typeof initMapLayer === "function") {
     DM4.map.initMapLayer = initMapLayer;
   } else {
-    console.error("[DREADMARCH][MAP] initMapLayer is not defined in dm4-map-layers.js.");
+    DM4.Logger.error("[MAP] initMapLayer is not defined in dm4-map-layers.js.");
   }
 })(); 

@@ -54,11 +54,11 @@
       DM4_STYLE_CONTRACT.requiredCssVars.forEach(function (name) {
         var value = cs.getPropertyValue(name).trim();
         if (!value) {
-          console.error("[DREADMARCH][STYLE] Missing required CSS variable:", name);
+          DM4.Logger.error("[STYLE] Missing required CSS variable:", name);
         }
       });
     } catch (err) {
-      console.error("[DREADMARCH][STYLE] Failed to run style contract checks:", err);
+      DM4.Logger.error("[STYLE] Failed to run style contract checks:", err);
     }
   }
 
@@ -69,7 +69,7 @@
     try {
       // 1) Inline styles are not allowed on UI elements
       document.querySelectorAll("[style]").forEach(function (el) {
-        console.warn("[DREADMARCH][STYLE] Inline style found on element:", el);
+        DM4.Logger.warn("[STYLE] Inline style found on element:", el);
       });
 
       // 2) Unknown dm-text-* classes
@@ -78,15 +78,15 @@
       document.querySelectorAll("[class*='dm-text-']").forEach(function (el) {
         el.classList.forEach(function (cls) {
           if (cls.indexOf("dm-text-") === 0 && !allowed.has(cls)) {
-            console.warn(
-              "[DREADMARCH][STYLE] Unknown text role class '" + cls + "' on element:",
+            DM4.Logger.warn(
+              "[STYLE] Unknown text role class '" + cls + "' on element:",
               el
             );
           }
         });
       });
     } catch (err) {
-      console.error("[DREADMARCH][STYLE] Failed to run DOM style contract checks:", err);
+      DM4.Logger.error("[STYLE] Failed to run DOM style contract checks:", err);
     }
   }
 

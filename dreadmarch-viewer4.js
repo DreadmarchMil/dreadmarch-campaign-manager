@@ -247,11 +247,11 @@
       DM4_STYLE_CONTRACT.requiredCssVars.forEach((name) => {
         const value = cs.getPropertyValue(name).trim();
         if (!value) {
-          console.error("[DREADMARCH][STYLE] Missing required CSS variable:", name);
+          DM4.Logger.error("[STYLE] Missing required CSS variable:", name);
         }
       });
     } catch (err) {
-      console.error("[DREADMARCH][STYLE] Failed to run style contract checks:", err);
+      DM4.Logger.error("[STYLE] Failed to run style contract checks:", err);
     }
   }
 
@@ -263,7 +263,7 @@
     try {
       // 1) Inline styles are not allowed on UI elements
       document.querySelectorAll("[style]").forEach((el) => {
-        console.warn("[DREADMARCH][STYLE] Inline style found on element:", el);
+        DM4.Logger.warn("[STYLE] Inline style found on element:", el);
       });
 
       // 2) Unknown dm-text-* classes
@@ -272,12 +272,12 @@
       document.querySelectorAll("[class*='dm-text-']").forEach((el) => {
         el.classList.forEach((cls) => {
           if (cls.startsWith("dm-text-") && !allowed.has(cls)) {
-            console.warn("[DREADMARCH][STYLE] Unknown text role class '" + cls + "' on element:", el);
+            DM4.Logger.warn("[STYLE] Unknown text role class '" + cls + "' on element:", el);
           }
         });
       });
     } catch (err) {
-      console.error("[DREADMARCH][STYLE] Failed to run DOM style contract checks:", err);
+      DM4.Logger.error("[STYLE] Failed to run DOM style contract checks:", err);
     }
   }
 
@@ -292,9 +292,9 @@
   function logCoreFunctionPresence() {
     if (!DM4_DEBUG) return;
     try {
-      console.log("[DREADMARCH][CORE] Expected core functions:", DM4_CORE_FUNCTIONS.join(", "));
+      DM4.Logger.log("[CORE] Expected core functions:", DM4_CORE_FUNCTIONS.join(", "));
     } catch (err) {
-      console.error("[DREADMARCH][CORE] Failed to log core functions:", err);
+      DM4.Logger.error("[CORE] Failed to log core functions:", err);
     }
   }
 
@@ -335,12 +335,12 @@
             return cls.startsWith(prefix);
           });
           if (!hasAllowedPrefix && !DM4_ALLOWED_STANDALONE_CLASSES.has(cls)) {
-            console.warn("[DREADMARCH][STYLE] Non-namespaced or unexpected class detected:", cls, "on element:", el);
+            DM4.Logger.warn("[STYLE] Non-namespaced or unexpected class detected:", cls, "on element:", el);
           }
         });
       });
     } catch (err) {
-      console.error("[DREADMARCH][STYLE] Failed to run class namespace checks:", err);
+      DM4.Logger.error("[STYLE] Failed to run class namespace checks:", err);
     }
   }
 
@@ -412,7 +412,7 @@ function applyStyleProfileForMode(mode) {
   // DM4_CORE_FUNCTION: normalizeDataset
   function normalizeDataset(raw) {
     if (!raw || typeof raw !== "object") {
-      console.warn("[DREADMARCH] normalizeDataset: empty or invalid raw dataset");
+      DM4.Logger.warn("normalizeDataset: empty or invalid raw dataset");
       return { systems: {} };
     }
 
@@ -540,7 +540,7 @@ function applyStyleProfileForMode(mode) {
       setMode: function (mode) {
         if (!isKnownMode(mode)) {
           if (DM4_DEBUG) {
-            console.warn("[DREADMARCH][STATE] Attempt to set unknown mode:", mode);
+            DM4.Logger.warn("[STATE] Attempt to set unknown mode:", mode);
           }
           return;
         }
@@ -628,7 +628,7 @@ function applyStyleProfileForMode(mode) {
         const y = coords[1];
 
         if (typeof x !== "number" || typeof y !== "number") {
-          console.warn("[DREADMARCH] Missing coords for system:", id);
+          DM4.Logger.warn("Missing coords for system:", id);
           return;
         }
 
@@ -652,7 +652,7 @@ function applyStyleProfileForMode(mode) {
               core.panelRegistry.activatePanel("editor");
             }
           } catch (err) {
-            console.warn("[DREADMARCH][EDITOR] Failed to activate editor panel on system click:", err);
+            DM4.Logger.warn("[EDITOR] Failed to activate editor panel on system click:", err);
           }
         });
 
@@ -709,7 +709,7 @@ function createSystemLabelsLayer(core) {
       const y = coords[1];
 
       if (typeof x !== "number" || typeof y !== "number") {
-        console.warn("[DREADMARCH] Missing coords for system (label):", id);
+        DM4.Logger.warn("Missing coords for system (label):", id);
         return;
       }
 
@@ -829,7 +829,7 @@ function createRouteLayer(core) {
     if (endpoints && Array.isArray(endpoints[id])) {
       return endpoints[id];
     }
-    console.warn("[DREADMARCH] Missing coords for route endpoint:", id);
+    DM4.Logger.warn("Missing coords for route endpoint:", id);
     return null;
   }
 
@@ -1260,7 +1260,7 @@ function initMapLayer(core, root) {
 
       if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(coordText).catch(function (err) {
-          console.warn("[DREADMARCH] Clipboard write failed:", err);
+          DM4.Logger.warn("Clipboard write failed:", err);
         });
       }
 
@@ -1329,7 +1329,7 @@ function initMapLayer(core, root) {
         typeof DM4.panels.IdentityPanel === "function") {
       return DM4.panels.IdentityPanel(core);
     }
-    console.error("[DREADMARCH][PANELS] DM4.panels.IdentityPanel is not available.");
+    DM4.Logger.error("[PANELS] DM4.panels.IdentityPanel is not available.");
     return null;
   }
 
@@ -1347,7 +1347,7 @@ function initMapLayer(core, root) {
         typeof DM4.panels.TestPanel === "function") {
       return DM4.panels.TestPanel(core);
     }
-    console.error("[DREADMARCH][PANELS] DM4.panels.TestPanel is not available.");
+    DM4.Logger.error("[PANELS] DM4.panels.TestPanel is not available.");
     return null;
   }
 
@@ -1559,7 +1559,7 @@ function initMapLayer(core, root) {
           URL.revokeObjectURL(url);
         }, 0);
       } catch (e) {
-        console.error("[DREADMARCH][EDITOR] Failed to export jobs:", e);
+        DM4.Logger.error("[EDITOR] Failed to export jobs:", e);
       }
     }
 
@@ -1692,8 +1692,8 @@ function initMapLayer(core, root) {
           ) {
             state.actions.addEditorJob(job);
           } else {
-            console.warn(
-              "[DREADMARCH][EDITOR] addEditorJob action not available; job not recorded."
+            DM4.Logger.warn(
+              "[EDITOR] addEditorJob action not available; job not recorded."
             );
           }
         });
@@ -1780,7 +1780,7 @@ function initMapLayer(core, root) {
           try {
             db5 = JSON.parse(JSON.stringify(currentDb5));
           } catch (e) {
-            console.error("[DREADMARCH][EDITOR] Failed to clone dataset for patch:", e);
+            DM4.Logger.error("[EDITOR] Failed to clone dataset for patch:", e);
             alert("Failed to clone dataset for patch. See console for details.");
             return;
           }
@@ -1789,7 +1789,7 @@ function initMapLayer(core, root) {
           try {
             logs = dm4ApplyJobsToDb5(db5, jobs, datasetId, true);
           } catch (e) {
-            console.error("[DREADMARCH][EDITOR] Patch failed:", e);
+            DM4.Logger.error("[EDITOR] Patch failed:", e);
             alert("Patch failed: " + (e && e.message ? e.message : String(e)));
             return;
           }
@@ -1809,7 +1809,7 @@ function initMapLayer(core, root) {
               window.DM4_DATASETS[datasetId] = db5;
             }
           } catch (e) {
-            console.warn("[DREADMARCH][EDITOR] Failed to update DM4_DATASETS cache:", e);
+            DM4.Logger.warn("[EDITOR] Failed to update DM4_DATASETS cache:", e);
           }
 
           // Clear editor jobs after successful patch
@@ -1836,13 +1836,13 @@ function initMapLayer(core, root) {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
           } catch (e) {
-            console.error("[DREADMARCH][EDITOR] Failed to download patched DB5:", e);
+            DM4.Logger.error("[EDITOR] Failed to download patched DB5:", e);
           }
 
           if (logs && logs.length) {
-            console.log("[DREADMARCH][EDITOR] Patch applied. Summary:");
+            DM4.Logger.log("[EDITOR] Patch applied. Summary:");
             for (var i = 0; i < logs.length; i++) {
-              console.log("  " + logs[i]);
+              DM4.Logger.log("  " + logs[i]);
             }
           }
         });
@@ -1901,8 +1901,8 @@ function initMapLayer(core, root) {
     try {
       const expectedRootClass = "dm4-" + id + "-root";
       if (!root.classList.contains(expectedRootClass)) {
-        console.warn(
-          "[DREADMARCH][PANEL] Panel '" + id + "' root missing expected class:",
+        DM4.Logger.warn(
+          "[PANEL] Panel '" + id + "' root missing expected class:",
           expectedRootClass,
           "on",
           root
@@ -1912,15 +1912,15 @@ function initMapLayer(core, root) {
       // Titles should use dm-text-title
       root.querySelectorAll("h1, h2, .dm4-" + id + "-title").forEach(function (el) {
         if (!el.classList.contains("dm-text-title")) {
-          console.warn("[DREADMARCH][PANEL] Panel '" + id + "' title without dm-text-title:", el);
+          DM4.Logger.warn("[PANEL] Panel '" + id + "' title without dm-text-title:", el);
         }
       });
 
       // Section headers should use dm-text-header
       root.querySelectorAll("[class*='-section-title']").forEach(function (el) {
         if (!el.classList.contains("dm-text-header")) {
-          console.warn(
-            "[DREADMARCH][PANEL] Panel '" + id + "' section header missing dm-text-header:",
+          DM4.Logger.warn(
+            "[PANEL] Panel '" + id + "' section header missing dm-text-header:",
             el
           );
         }
@@ -1933,14 +1933,14 @@ function initMapLayer(core, root) {
           !el.classList.contains("dm-text-header") &&
           !el.classList.contains("dm-text-title")
         ) {
-          console.warn(
-            "[DREADMARCH][PANEL] Panel '" + id + "' line missing any text role class:",
+          DM4.Logger.warn(
+            "[PANEL] Panel '" + id + "' line missing any text role class:",
             el
           );
         }
       });
     } catch (err) {
-      console.error("[DREADMARCH][PANEL] Failed panel contract check for '" + id + "':", err);
+      DM4.Logger.error("[PANEL] Failed panel contract check for '" + id + "':", err);
     }
   }
 
@@ -1970,13 +1970,13 @@ function initMapLayer(core, root) {
 
       const factory = factories[id];
       if (!factory) {
-        console.warn("[DREADMARCH][PANEL] Unknown panel id:", id);
+        DM4.Logger.warn("[PANEL] Unknown panel id:", id);
         return;
       }
 
       if (!isKnownPanel(id) && DM4_DEBUG) {
-        console.warn(
-          "[DREADMARCH][PANEL] Activating non-core or legacy panel id (not in DM4_PANELS):",
+        DM4.Logger.warn(
+          "[PANEL] Activating non-core or legacy panel id (not in DM4_PANELS):",
           id
         );
       }
@@ -1996,8 +1996,8 @@ function initMapLayer(core, root) {
     return {
       registerPanel: function (id, factory) {
         if (DM4_DEBUG) {
-          console.warn(
-            "[DREADMARCH][PANEL] registerPanel used for id '" +
+          DM4.Logger.warn(
+            "[PANEL] registerPanel used for id '" +
               id +
               "'. Prefer adding panels via DM4_PANELS for canonical registry."
           );
@@ -2066,7 +2066,7 @@ function initMapLayer(core, root) {
     });
 
     cmdBtn.addEventListener("click", function () {
-      console.log("[DREADMARCH] Command Interface test hook — activating TEST PANEL.");
+      DM4.Logger.log("Command Interface test hook — activating TEST PANEL.");
       panelRegistry.activatePanel("test");
     });
 
@@ -2202,7 +2202,7 @@ state.subscribe(function (st) {
         });
       }
     } catch (e) {
-      console.warn("[DREADMARCH] Failed to build dataset selector from DM4_DATASETS:", e);
+      DM4.Logger.warn("Failed to build dataset selector from DM4_DATASETS:", e);
     }
 
     datasetSelect.addEventListener("change", function () {
@@ -2212,7 +2212,7 @@ state.subscribe(function (st) {
           window.DM4_startViewerWithDataset(id);
         }
       } catch (e) {
-        console.error("[DREADMARCH] Failed to switch dataset via DM4_startViewerWithDataset:", e);
+        DM4.Logger.error("Failed to switch dataset via DM4_startViewerWithDataset:", e);
       }
     });
 
@@ -2244,7 +2244,7 @@ state.subscribe(function (st) {
       }
     } catch (e) {
       // Non-fatal; dataset selector is optional
-      console.warn("[DREADMARCH] Dataset selector state sync failed:", e);
+      DM4.Logger.warn("Dataset selector state sync failed:", e);
     }
 
     // Expose coordinate readout on core for map layer hooks
@@ -2287,58 +2287,56 @@ state.subscribe(function (st) {
     if (!DM4_DEBUG) {
       return;
     }
-    console.group("[DREADMARCH] Panel Registry Status");
+    DM4.Logger.log("[DREADMARCH] Panel Registry Status");
     var panels = typeof DM4_PANELS !== "undefined" ? DM4_PANELS : null;
     if (!panels) {
-      console.warn("[DREADMARCH][PANEL] DM4_PANELS registry is not defined.");
+      DM4.Logger.warn("[PANEL] DM4_PANELS registry is not defined.");
     } else {
       var ids = Object.keys(panels);
-      console.log("[DREADMARCH][PANEL] Registered panels:", ids);
+      DM4.Logger.log("[PANEL] Registered panels:", ids);
       ids.forEach(function (id) {
         var entry = panels[id];
         if (!entry || typeof entry.factory !== "function") {
-          console.warn("[DREADMARCH][PANEL] Panel '" + id + "' has no valid factory.");
+          DM4.Logger.warn("[PANEL] Panel '" + id + "' has no valid factory.");
         }
       });
     }
     if (panelRegistry) {
-      console.log(
-        "[DREADMARCH][PANEL] Active panel id:",
+      DM4.Logger.log(
+        "[PANEL] Active panel id:",
         panelRegistry.activePanelId || "(none)"
       );
     }
-    console.groupEnd();
   }
 
   // DM4_HELPER_FUNCTION: runDm4SelfTest
   function runDm4SelfTest(core, panelRegistry) {
-    console.group("[DREADMARCH] DM4 Self-Test");
+    DM4.Logger.log("DM4 Self-Test");
     if (typeof runStyleContractChecks === "function") {
       try {
         runStyleContractChecks();
-        console.log("[DREADMARCH][SELFTEST] Style contract check passed.");
+        DM4.Logger.log("[SELFTEST] Style contract check passed.");
       } catch (err) {
-        console.error("[DREADMARCH][SELFTEST] Style contract check failed:", err);
+        DM4.Logger.error("[SELFTEST] Style contract check failed:", err);
       }
     }
     if (typeof runDomStyleContractChecks === "function") {
       try {
         runDomStyleContractChecks();
-        console.log("[DREADMARCH][SELFTEST] DOM style contract check ran.");
+        DM4.Logger.log("[SELFTEST] DOM style contract check ran.");
       } catch (err) {
-        console.error("[DREADMARCH][SELFTEST] DOM style contract check failed:", err);
+        DM4.Logger.error("[SELFTEST] DOM style contract check failed:", err);
       }
     }
     if (typeof runClassNamespaceChecks === "function") {
       try {
         runClassNamespaceChecks();
-        console.log("[DREADMARCH][SELFTEST] Class namespace check ran.");
+        DM4.Logger.log("[SELFTEST] Class namespace check ran.");
       } catch (err) {
-        console.error("[DREADMARCH][SELFTEST] Class namespace check failed:", err);
+        DM4.Logger.error("[SELFTEST] Class namespace check failed:", err);
       }
     }
     logPanelRegistryStatus(core, panelRegistry || null);
-    console.groupEnd();
   }
 
   }
@@ -2347,7 +2345,7 @@ state.subscribe(function (st) {
     bootstrap: bootstrapViewer,
     selfTest: function (viewer) {
       if (!viewer || !viewer.core) {
-        console.error(
+        DM4.Logger.error(
           "[DREADMARCH] selfTest expected a viewer instance returned by DreadmarchViewer4.bootstrap()."
         );
         return;
@@ -2356,7 +2354,7 @@ state.subscribe(function (st) {
     },
     logPanelRegistryStatus: function (viewer) {
       if (!viewer || !viewer.core) {
-        console.error(
+        DM4.Logger.error(
           "[DREADMARCH] logPanelRegistryStatus expected a viewer instance returned by DreadmarchViewer4.bootstrap()."
         );
         return;
