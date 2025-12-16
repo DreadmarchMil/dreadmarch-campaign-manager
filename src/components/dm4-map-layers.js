@@ -317,7 +317,8 @@ function createGridLayer(core) {
   
   // Draw grid cell labels at grid line intersections
   var colOrigin = galacticGrid.col_origin || 17;
-  var colBaseCharCode = "N".charCodeAt(0);
+  var rowOrigin = galacticGrid.row_origin || "N";
+  var colBaseCharCode = rowOrigin.charCodeAt(0);
 
   for (var i = -2; i <= 2; i++) {
     var colLetter = String.fromCharCode(colBaseCharCode + i);
