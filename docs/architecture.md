@@ -189,9 +189,9 @@ Normalized Dataset (consolidated data)
    ↓
 2. Load module scripts in order
    ↓
-3. Load dataset (window.DM4_DATASETS.arbra)
+3. Load dataset (window.DM4_DATASETS.main)
    ↓
-4. Call DM4_startViewerWithDataset('arbra')
+4. Call DM4_startViewerWithDataset('main')
    ↓
 5. Bootstrap viewer:
    - Normalize dataset
