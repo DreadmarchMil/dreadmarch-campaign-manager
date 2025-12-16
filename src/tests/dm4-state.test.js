@@ -27,7 +27,7 @@ describe('DM4 State Manager', () => {
     };
 
     // Load the module - it executes immediately
-    require('../dm4-state.js');
+    require('../core/dm4-state.js');
   });
 
   afterAll(() => {

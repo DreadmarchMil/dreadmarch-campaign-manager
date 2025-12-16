@@ -16,7 +16,7 @@ describe('DM4 Dataset Core - normalizeDataset', () => {
     DM4 = global.DM4;
 
     // Load the module - it executes immediately
-    require('../dm4-dataset-core.js');
+    require('../core/dm4-dataset-core.js');
   });
 
   afterAll(() => {
