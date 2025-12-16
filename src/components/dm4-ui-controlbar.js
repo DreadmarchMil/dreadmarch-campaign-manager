@@ -91,6 +91,8 @@
 
       // Grid toggle button
       let gridVisible = true; // Default to visible
+      gridToggle.classList.add("active"); // Set initial button state
+      
       gridToggle.addEventListener("click", function () {
         gridVisible = !gridVisible;
         const appElement = document.querySelector(".app");
@@ -104,8 +106,6 @@
           }
         }
       });
-      // Set initial state
-      gridToggle.classList.add("active");
 
       const unsubscribe = core.state.subscribe(function (st) {
         setActiveButton(st.mode || "navcom");
