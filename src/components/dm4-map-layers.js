@@ -315,31 +315,22 @@ function createGridLayer(core) {
     svg.appendChild(line);
   }
   
-  // Draw grid cell labels
+  // Draw grid cell labels at grid line intersections
   var colOrigin = galacticGrid.col_origin || 17;
-  var rowOrigin = galacticGrid.row_origin || "N";
-  
-  // Helper: Calculate grid cell identifier
-  // Grid uses column letters (L, M, N, O, P) and row numbers (16-20)
-  // Reference cell N-17 is at position (0, 0) in the offset system
-  // Column N has charCode for 'N', M is 'N'-1, L is 'N'-2, O is 'N'+1, P is 'N'+2
-  function getGridCellLabel(colOffset, rowOffset) {
-    var colBaseCharCode = rowOrigin.charCodeAt(0);
-    var colLetter = String.fromCharCode(colBaseCharCode + colOffset);
-    var rowNumber = colOrigin + rowOffset;
-    return colLetter + "-" + rowNumber;
-  }
-  
+  var colBaseCharCode = "N".charCodeAt(0);
+
   for (var i = -2; i <= 2; i++) {
+    var colLetter = String.fromCharCode(colBaseCharCode + i);
     var vx = x0 + i * cw;
     
     for (var j = -1; j <= 3; j++) {
+      var rowNumber = colOrigin + j;
       var hy = y0 + j * ch;
       
-      var labelText = getGridCellLabel(i, j);
+      var labelText = colLetter + "-" + rowNumber;
       var textEl = document.createElementNS(svgNS, "text");
       textEl.setAttribute("x", vx + 8);
-      textEl.setAttribute("y", hy + ch - 8);
+      textEl.setAttribute("y", hy + 20);
       textEl.setAttribute("class", "grid-label");
       textEl.textContent = labelText;
       svg.appendChild(textEl);
