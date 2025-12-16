@@ -315,10 +315,14 @@ function createGridLayer(core) {
     svg.appendChild(line);
   }
   
-  // Draw grid cell labels at grid line intersections
+  // Draw grid labels at line intersections
   var colOrigin = galacticGrid.col_origin || 17;
   var rowOrigin = galacticGrid.row_origin || "N";
   var colBaseCharCode = rowOrigin.charCodeAt(0);
+  
+  // Label positioning offsets from intersection point
+  var labelOffsetX = 8;
+  var labelOffsetY = 20;
 
   for (var i = -2; i <= 2; i++) {
     var colLetter = String.fromCharCode(colBaseCharCode + i);
@@ -330,8 +334,8 @@ function createGridLayer(core) {
       
       var labelText = colLetter + "-" + rowNumber;
       var textEl = document.createElementNS(svgNS, "text");
-      textEl.setAttribute("x", vx + 8);
-      textEl.setAttribute("y", hy + 20);
+      textEl.setAttribute("x", vx + labelOffsetX);
+      textEl.setAttribute("y", hy + labelOffsetY);
       textEl.setAttribute("class", "grid-label");
       textEl.textContent = labelText;
       svg.appendChild(textEl);
