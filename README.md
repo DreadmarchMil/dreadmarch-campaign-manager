@@ -129,7 +129,7 @@ See `Dreadmarch_Development_Protocol_v1.6.txt` for comprehensive development gui
 ## Getting Started
 
 1. Open `index.html` in a modern web browser
-2. The viewer will load the default dataset (`arbra`)
+2. The viewer will load the default dataset (`main`)
 3. Use the control bar to switch between modes:
    - **NAVCOM**: Navigation and exploration mode
    - **EDITOR**: Dataset editing mode
