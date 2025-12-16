@@ -140,58 +140,11 @@
     root.innerHTML = "";
     root.classList.add("dm4-root-shell");
 
-    DM4.Logger.log("[BOOTSTRAP] Building top bar with dataset selector");
+    DM4.Logger.log("[BOOTSTRAP] Building top bar");
     
     // Top bar above the three-column layout
     var topBar = document.createElement("div");
     topBar.classList.add("dm-top-bar");
-
-    // Dataset selector (host-driven, optional)
-    var datasetContainer = document.createElement("div");
-    datasetContainer.classList.add("dm-top-bar-datasets", "dm-text-small", "dm-text-header");
-
-    var datasetLabel = document.createElement("span");
-    datasetLabel.textContent = "Dataset:";
-
-    var datasetSelect = document.createElement("select");
-    datasetSelect.classList.add("dm-top-bar-dataset-select");
-
-    // Populate dropdown options from host-provided DM4_DATASETS
-    try {
-      if (typeof window !== "undefined" && window.DM4_DATASETS) {
-        var dsMap = window.DM4_DATASETS;
-        Object.keys(dsMap).forEach(function (id) {
-          var meta = dsMap[id] && dsMap[id].dataset_metadata;
-          var label = (meta && (meta.display_name || meta.name)) || id;
-          var opt = document.createElement("option");
-          opt.value = id;
-          opt.textContent = label;
-          datasetSelect.appendChild(opt);
-        });
-        
-        // Set current selection if available
-        if (window.DM4_CURRENT_DATASET_ID) {
-          datasetSelect.value = window.DM4_CURRENT_DATASET_ID;
-        }
-      }
-    } catch (e) {
-      DM4.Logger.warn("[BOOTSTRAP] Failed to build dataset selector from DM4_DATASETS:", e);
-    }
-
-    datasetSelect.addEventListener("change", function () {
-      var id = datasetSelect.value;
-      DM4.Logger.log("[BOOTSTRAP] Dataset selector changed to:", id);
-      try {
-        if (window && typeof window.DM4_startViewerWithDataset === "function") {
-          window.DM4_startViewerWithDataset(id);
-        }
-      } catch (e) {
-        DM4.Logger.error("[BOOTSTRAP] Failed to switch dataset via DM4_startViewerWithDataset:", e);
-      }
-    });
-
-    datasetContainer.appendChild(datasetLabel);
-    datasetContainer.appendChild(datasetSelect);
 
     // Title container
     var topTitle = document.createElement("div");
@@ -204,7 +157,6 @@
     topBarCoords.textContent = "Parsec Coordinates: ---";
 
     // Assemble top bar
-    topBar.appendChild(datasetContainer);
     topBar.appendChild(topTitle);
     topBar.appendChild(topBarCoords);
 
