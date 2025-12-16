@@ -359,27 +359,34 @@ function createRouteLayer(core) {
 
   // DM4_HELPER_FUNCTION: createCurvedPath
   // Generate a natural-looking curved path between two points
+  // Constants for curve generation
+  const MIN_CURVE_DISTANCE = 200;        // Minimum distance to apply curves
+  const CURVE_MAGNITUDE_RATIO = 0.10;    // Curve depth as percentage of distance
+  const HASH_MODULUS = 1000;             // Modulus for coordinate hash
+  const RANDOM_RANGE = 0.5;              // Range of random variation
+  const RANDOM_BASE_FACTOR = 0.75;       // Base factor for randomness (0.75 to 1.25)
+  
   function createCurvedPath(x1, y1, x2, y2) {
     const dx = x2 - x1;
     const dy = y2 - y1;
     const dist = Math.sqrt(dx * dx + dy * dy);
     
     // For very short routes, use straight lines
-    if (dist < 200) {
+    if (dist < MIN_CURVE_DISTANCE) {
       return "M " + x1 + " " + y1 + " L " + x2 + " " + y2;
     }
     
     // Calculate curve control point offset perpendicular to the line
-    // Use a subtle curve (10% of distance) for natural appearance
-    const curveMagnitude = dist * 0.10;
+    // Use a subtle curve for natural appearance
+    const curveMagnitude = dist * CURVE_MAGNITUDE_RATIO;
     
     // Perpendicular vector (rotated 90 degrees)
     const perpX = -dy / dist;
     const perpY = dx / dist;
     
     // Add slight randomness based on coordinate hash for variety
-    const hash = (x1 + y1 + x2 + y2) % 1000;
-    const randomFactor = (hash / 1000) * 0.5 + 0.75; // Range: 0.75 to 1.25
+    const hash = (x1 + y1 + x2 + y2) % HASH_MODULUS;
+    const randomFactor = (hash / HASH_MODULUS) * RANDOM_RANGE + RANDOM_BASE_FACTOR;
     
     // Control point at midpoint, offset perpendicular to the line
     const midX = (x1 + x2) / 2;
