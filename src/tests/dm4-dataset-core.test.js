@@ -15,6 +15,9 @@ describe('DM4 Dataset Core - normalizeDataset', () => {
     };
     DM4 = global.DM4;
 
+    // Load the Logger module first (required dependency)
+    require('../core/dm4-logger.js');
+    
     // Load the module - it executes immediately
     require('../core/dm4-dataset-core.js');
   });
