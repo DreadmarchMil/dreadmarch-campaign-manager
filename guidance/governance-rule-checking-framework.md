@@ -1,64 +1,13 @@
-# Governance Rule-Checking Framework for Dreadmarch Campaign Manager
+# Governance Rule-Checking Framework
 
-## Finalized Governance Framework:
-The governance framework outlined in this document has been derived from "Dreadmarch_Development_Protocol v1.5." It consolidates all the fundamental principles, ensuring that the system adheres to established development protocols while remaining flexible.
+## Key-Based Access Controls
+To ensure secure and flexible governance, implement Key-Based Access Controls (KBAC). KBAC allows the assignment of specific keys to users or roles, defining granular permissions. This ensures that users only have access to rules and resources necessary for their roles within the system. Regular audits of keys and their scopes enable better compliance with security policies.
 
----
+## Technical Architecture Alignment
+Align governance rules closely with the underlying technical architecture. This ensures that rules are enforceable and do not conflict with the inherent capabilities or limitations of the platform. Maintaining strict alignment helps avoid technical debt and enhances the scalability and robustness of the framework.
 
-## Translated Guidance from Dreadmarch_Development_Protocol v1.5
+## User Role Segregation
+The framework must support stringent User Role Segregation (URS). Clearly define roles and ensure that responsibility boundaries are maintained to prevent privilege escalation issues. URS improves system integrity and reduces the risk introduced by insider threats and inadvertent errors.
 
-### Core Governance Rules
-
-1. **No Guessing or Implicit Assumptions**:
-   - All actions must rely solely on explicit inputs from the user or existing canonical resources.
-   - If there is any ambiguity, contradiction, or outdated information, pause and request clarification.
-
-2. **Avoid Duplication**:
-   - Ensure no duplicate implementations of features, datasets, or systems exist.
-   - Always check for existing structures or logic before creating something new.
-
-3. **Environment Awareness**:
-   - If the working environment resets or loses context, you must notify the user of what's missing and request required inputs/files.
-
-4. **Mandatory Rule Check Pre-Actions**:
-   - Identify the type of action (e.g., dataset modification, UI update, module reorganization).
-   - Validate the action against all relevant rules and state whether it’s:
-     - **Allowed**
-     - **Conditionally Allowed**
-     - **Not Allowed**
-   - Cite specific rules when evaluating an action and pause unless explicitly okayed in the prior instruction.
-
-5. **Simplicity First**:
-   - Proactively suggest simpler designs or workflows where applicable.
-   - Explain the trade-offs, and only simplify with explicit user approval.
-
----
-
-### Dataset Rules
-
-1. **Strict Dataset Modifications**:
-   - Use only editor jobs adhering to DB5 patch systems.
-2. **No Implicit Calculations**:
-   - Endpoint recalculations or inferred data are not permitted unless explicitly requested.
-3. **Formal Schema Updates**:
-   - Adding new schema fields requires explicit user approval and a formal protocol process.
-
----
-
-### Viewer Architecture Rules
-
-1. **Centralized State**:
-   - Center all datasets, styling modules, and panels within the `window.DM4` namespace.
-2. **Error Transparency**:
-   - Fail any initializations that encounter missing modules, invalid data, or UI contracts clearly and visibly.
-3. **Host Separation**:
-   - Host-specific code must remain in dedicated files and not interfere with core module logic.
-
----
-
-### UI & Style Contract Rules
-
-1. **Text Roles**:
-   - Adhere strictly to pre-approved text-role classes. All updates require formal integration into protocols.
-2. **Style Modularity**:
-   - All palette variable modifications must remain confined to dedicated style modules.
+## Milestone Influence
+Introduce Milestone Influence as a core concept of the governance framework. Define checkpoints or milestones within project lifecycles that trigger governance layer involvement. These milestones could include the introduction of new system features, periodic compliance reviews, or the onboarding of high-risk users. This practice ensures that governance adapts proactively rather than reacting to issues post hoc.
