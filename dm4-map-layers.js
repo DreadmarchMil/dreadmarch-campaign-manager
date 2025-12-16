@@ -12,6 +12,64 @@
 /****************************************
    * 4) MAP: SYSTEM MARKERS & ROUTE LAYER
    ****************************************/
+  
+  // DM4_HELPER_FUNCTION: createSpatialIndex
+  // Simple grid-based spatial index for efficient viewport culling
+  // NOTE: This spatial index enables future viewport-based virtualization.
+  // When implemented, it will allow rendering only visible markers/labels
+  // by querying the index with the current viewport bounds.
+  // For datasets with 100+ systems, this provides significant performance gains.
+  function createSpatialIndex(systems, cellSize) {
+    const index = new Map();
+    const cellSize_ = cellSize || 512; // Default cell size
+    
+    Object.entries(systems).forEach(function ([id, sys]) {
+      const coords = sys.coords || [];
+      const x = coords[0];
+      const y = coords[1];
+      
+      if (typeof x !== "number" || typeof y !== "number") return;
+      
+      const cellX = Math.floor(x / cellSize_);
+      const cellY = Math.floor(y / cellSize_);
+      const cellKey = cellX + "," + cellY;
+      
+      if (!index.has(cellKey)) {
+        index.set(cellKey, []);
+      }
+      index.get(cellKey).push({ id: id, x: x, y: y, sys: sys });
+    });
+    
+    return {
+      cellSize: cellSize_,
+      index: index,
+      // Query systems within a bounding box
+      query: function(minX, minY, maxX, maxY) {
+        const results = [];
+        const cellMinX = Math.floor(minX / cellSize_);
+        const cellMinY = Math.floor(minY / cellSize_);
+        const cellMaxX = Math.floor(maxX / cellSize_);
+        const cellMaxY = Math.floor(maxY / cellSize_);
+        
+        for (let cx = cellMinX; cx <= cellMaxX; cx++) {
+          for (let cy = cellMinY; cy <= cellMaxY; cy++) {
+            const cellKey = cx + "," + cy;
+            const cell = index.get(cellKey);
+            if (cell) {
+              cell.forEach(function(item) {
+                if (item.x >= minX && item.x <= maxX && 
+                    item.y >= minY && item.y <= maxY) {
+                  results.push(item);
+                }
+              });
+            }
+          }
+        }
+        return results;
+      }
+    };
+  }
+  
   // DM4_CORE_FUNCTION: createSystemMarkersLayer
   function createSystemMarkersLayer(core) {
     const state = core.state;
@@ -74,19 +132,36 @@
     }
 
     // DM4_HELPER_FUNCTION: renderSelection
+    // Memoized: only updates when selection actually changes
+    let lastSelectedMarkerId = null;
 
     function renderSelection(st) {
       const selected = (st.selection && st.selection.system) || null;
-      markerById.forEach(function (marker, id) {
-        marker.classList.toggle("dm-system-selected", id === selected);
-      });
+      
+      // Skip render if selection hasn't changed (memoization)
+      if (selected === lastSelectedMarkerId) {
+        return;
+      }
+      
+      // Update previous selection marker
+      if (lastSelectedMarkerId && markerById.has(lastSelectedMarkerId)) {
+        markerById.get(lastSelectedMarkerId).classList.remove("dm-system-selected");
+      }
+      
+      // Update new selection marker
+      if (selected && markerById.has(selected)) {
+        markerById.get(selected).classList.add("dm-system-selected");
+      }
+      
+      lastSelectedMarkerId = selected;
     }
 
     buildMarkers(core.state.getState().dataset);
 
+    // Use scoped subscription - only listen to selection changes
     unsubscribe = state.subscribe(function (st) {
       renderSelection(st);
-    });
+    }, ['selection']);
 
     return {
       element: container,
@@ -146,18 +221,35 @@ function createSystemLabelsLayer(core) {
   }
 
   // DM4_HELPER_FUNCTION: renderSelection
+  // Memoized: only updates when selection actually changes
+  let lastSelectedLabelId = null;
 
   function renderSelection(st) {
     const selected = (st.selection && st.selection.system) || null;
-    labelById.forEach(function (label, id) {
-      label.classList.toggle("dm-system-label-selected", id === selected);
-    });
+    
+    // Skip render if selection hasn't changed (memoization)
+    if (selected === lastSelectedLabelId) {
+      return;
+    }
+    
+    // Update previous selection label
+    if (lastSelectedLabelId && labelById.has(lastSelectedLabelId)) {
+      labelById.get(lastSelectedLabelId).classList.remove("dm-system-label-selected");
+    }
+    
+    // Update new selection label
+    if (selected && labelById.has(selected)) {
+      labelById.get(selected).classList.add("dm-system-label-selected");
+    }
+    
+    lastSelectedLabelId = selected;
   }
 
   buildLabels(state.getState().dataset);
+  // Use scoped subscription - only listen to selection changes
   unsubscribe = state.subscribe(function (st) {
     renderSelection(st);
-  });
+  }, ['selection']);
 
   return {
     element: container,
@@ -379,28 +471,48 @@ function createRouteLayer(core) {
   }
 
   // DM4_HELPER_FUNCTION: renderSelection
+  // Memoized: only updates when selection actually changes
+  let lastSelectedRouteId = null;
+  let lastSelectedLines = [];
 
   function renderSelection(st) {
     const selected = (st.selection && st.selection.system) || null;
+    
+    // Skip render if selection hasn't changed (memoization)
+    if (selected === lastSelectedRouteId) {
+      return;
+    }
 
-    // Clear all selection styling
-    allLines.forEach(function (line) {
+    // Clear previous selection styling (only previously selected lines)
+    lastSelectedLines.forEach(function (line) {
       line.classList.remove("dm-route-selected");
     });
+    lastSelectedLines = [];
 
-    if (!selected) return;
+    if (!selected) {
+      lastSelectedRouteId = null;
+      return;
+    }
 
     const list = linesBySystem.get(selected);
-    if (!list || !list.length) return;
+    if (!list || !list.length) {
+      lastSelectedRouteId = selected;
+      return;
+    }
 
+    // Apply new selection styling
     list.forEach(function (line) {
       line.classList.add("dm-route-selected");
+      lastSelectedLines.push(line);
     });
+    
+    lastSelectedRouteId = selected;
   }
 
+  // Use scoped subscription - only listen to selection changes
   const unsubscribe = state.subscribe(function (st) {
     renderSelection(st);
-  });
+  }, ['selection']);
 
   // Initial render
   renderSelection(state.getState());
@@ -731,10 +843,15 @@ function initMapLayer(core, root) {
 
 
 
-  // Expose map initializer on DM4 namespace
+  // Expose map initializer and utilities on DM4 namespace
   if (typeof initMapLayer === "function") {
     DM4.map.initMapLayer = initMapLayer;
   } else {
     DM4.Logger.error("[MAP] initMapLayer is not defined in dm4-map-layers.js.");
+  }
+  
+  // Expose spatial index for future virtualization features
+  if (typeof createSpatialIndex === "function") {
+    DM4.map.createSpatialIndex = createSpatialIndex;
   }
 })(); 

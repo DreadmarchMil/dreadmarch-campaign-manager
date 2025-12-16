@@ -497,10 +497,42 @@
         navDetails.appendChild(navRoot);
       }
 
+      // Memoization: Cache computed values to avoid recomputation
+      let lastSelectionId = null;
+      let lastDatasetVersion = null;
+      let cachedNavcomData = null;
+
+      function hasDatasetChanged(st) {
+        const currentVersion = st.dataset && st.dataset.dataset_metadata && st.dataset.dataset_metadata.version;
+        if (currentVersion !== lastDatasetVersion) {
+          lastDatasetVersion = currentVersion;
+          return true;
+        }
+        return false;
+      }
+
       const unsubscribe = state.subscribe(function (st) {
-        renderIdentity(st);
-        renderNavcom(st);
-      });
+        const selId = st.selection && st.selection.system;
+        const datasetChanged = hasDatasetChanged(st);
+        const selectionChanged = selId !== lastSelectionId;
+        
+        // Only re-render identity when selection changes
+        if (selectionChanged) {
+          renderIdentity(st);
+          cachedNavcomData = null; // Invalidate cache when selection changes
+        }
+        
+        // Only re-render navcom when selection changes or dataset changes
+        if (selectionChanged || datasetChanged || !cachedNavcomData) {
+          renderNavcom(st);
+          cachedNavcomData = { selId, datasetVersion: lastDatasetVersion };
+        }
+        
+        // Update last selection after rendering
+        if (selectionChanged) {
+          lastSelectionId = selId;
+        }
+      }, ['selection', 'dataset']); // Scoped subscription - only listen to selection and dataset changes
 
       return {
         mount: function (host) {
