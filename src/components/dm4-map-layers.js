@@ -372,8 +372,8 @@ function createRouteLayer(core) {
   // DM4_HELPER_FUNCTION: createCurvedRoutePath
   // Generate dramatically curved paths for major routes
   // Constants for curve generation
-  const CURVE_OFFSET_PIXELS = 50;    // Fixed offset in pixels for visible curves
-  const MIN_CURVE_DISTANCE = 150;     // Minimum distance to apply curves
+  const CURVE_OFFSET_PIXELS = 150;    // Fixed offset in pixels for VERY visible curves
+  const MIN_CURVE_DISTANCE = 100;     // Minimum distance to apply curves
   
   function createCurvedRoutePath(points) {
     if (!points || points.length < 2) return "";
