@@ -1,11 +1,12 @@
 module.exports = {
   testEnvironment: 'jsdom',
   testMatch: [
-    '**/__tests__/**/*.test.js'
+    '**/src/tests/**/*.test.js'
   ],
   collectCoverageFrom: [
-    'dm4-*.js',
-    '!dm4-dataset-main.js',
-    '!dm4-runtime.js'
+    'src/**/*.js',
+    '!src/core/dm4-dataset-main.js',
+    '!src/core/dm4-runtime.js',
+    '!src/tests/**/*.js'
   ]
 };
