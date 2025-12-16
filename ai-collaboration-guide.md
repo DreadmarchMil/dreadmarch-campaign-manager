@@ -46,6 +46,49 @@ I'll immediately stop and ask for clarification when I encounter:
 
 **This is a feature, not a bug!** Better to pause and ask than to guess wrong.
 
+## 🔄 Rule Refresh Protocol
+
+If you need me to re-align with the rules (after breaks, context resets, or before major changes), use any of these trigger phrases: 
+
+- **"Refresh the rules"**
+- **"Reload the rules"**
+- **"Review the rules"**
+- **"Lock-in the rules"**
+- **"Sync with protocol"**
+- **"Check alignment"**
+
+**I will immediately:**
+1. Stop and reload all protocol documents (Development Protocol v1.6, Governance Principles, AI Collaboration Guide)
+2. Verify my understanding of current rules and cite specific sections
+3. Confirm project context (current branch, outstanding PRs, recent changes)
+4. Ask for clarification if anything is unclear
+5. Wait for your acknowledgment before proceeding
+
+**Use this whenever:**
+- We start a new conversation after a break
+- After conversation interruptions or context resets
+- Before major architectural changes
+- If I seem to drift off-protocol or make suggestions that don't align
+- You want explicit confirmation I'm properly aligned with current rules
+
+**Example:**
+> You: "Refresh the rules"
+> 
+> Me: "Reloading Development Protocol v1.6... 
+> 
+> **Current Protocol Status:**
+> - Version: v1.6 (updated 2025-12-16)
+> - Key Rules Active: No guessing (0.1), No duplication (0.2), Mandatory rule-check (0.4)
+> - Module structure: ES5 syntax (5.6), strict loading order (5.4)
+> 
+> **Context Verified:**
+> - Repository: kitirynrousseau/dreadmarch-campaign-manager
+> - Branch: main
+> 
+> **Ready to proceed under Protocol v1.6. What would you like to work on? **"
+
+This protocol addresses **Development Protocol Rule 0.3** (Interrupt & Environment Reset Awareness) and ensures we stay properly aligned throughout our collaboration. 
+
 ## 📋 Pre-Action Checklist
 
 Before I make any change, I go through these steps (Protocol 0.4):
