@@ -912,8 +912,26 @@ function createRouteLayer(core) {
     }
   }
 
-  // Add mousemove listener to SVG
-  svg.addEventListener("mousemove", handleRouteHover);
+  // Track listener target for proper cleanup
+  var hoverListenerTarget = null;
+  
+  // DM4_HELPER_FUNCTION: attachHoverListener
+  // Attach mousemove listener to map container (not SVG, which has pointer-events: none)
+  function attachHoverListener() {
+    var mapContainer = document.querySelector('.dm-map-container');
+    if (mapContainer && !hoverListenerTarget) {
+      mapContainer.addEventListener("mousemove", handleRouteHover);
+      hoverListenerTarget = mapContainer;
+    }
+  }
+  
+  // Try to attach listener immediately if container exists
+  attachHoverListener();
+  
+  // If not attached yet, retry after a short delay (during initialization)
+  if (!hoverListenerTarget) {
+    setTimeout(attachHoverListener, 50);
+  }
 
   // DM4_HELPER_FUNCTION: renderSelection
   // Memoized: only updates when selection actually changes
@@ -966,7 +984,11 @@ function createRouteLayer(core) {
     element: svg,
     destroy: function () {
       if (unsubscribe) unsubscribe();
-      svg.removeEventListener("mousemove", handleRouteHover);
+      // Remove listener from the correct target (map container, not SVG)
+      if (hoverListenerTarget) {
+        hoverListenerTarget.removeEventListener("mousemove", handleRouteHover);
+        hoverListenerTarget = null;
+      }
       if (currentRouteLabel && currentRouteLabel.parentNode) {
         currentRouteLabel.parentNode.removeChild(currentRouteLabel);
       }
