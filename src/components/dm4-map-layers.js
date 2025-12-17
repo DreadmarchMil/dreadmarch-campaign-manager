@@ -465,6 +465,8 @@ function createRouteLayer(core) {
   // DM4_HELPER_FUNCTION: calculateTangentAngle
   // Calculate the angle of the route at an endpoint based on the curve tangent
   function calculateTangentAngle(endpointId, routeId) {
+    var ENDPOINT_MATCH_TOLERANCE = 2;
+    
     var segments = hyperlanes[routeId];
     if (!segments || !segments.length) return 0;
     
@@ -495,18 +497,26 @@ function createRouteLayer(core) {
     var endX = endCoords[0];
     var endY = endCoords[1];
     
-    var isFirstEndpoint = Math.abs(curvePoints[0][0] - endX) < 1 && Math.abs(curvePoints[0][1] - endY) < 1;
-    var isLastEndpoint = Math.abs(curvePoints[curvePoints.length - 1][0] - endX) < 1 && Math.abs(curvePoints[curvePoints.length - 1][1] - endY) < 1;
+    var distToFirst = Math.sqrt(Math.pow(curvePoints[0][0] - endX, 2) + Math.pow(curvePoints[0][1] - endY, 2));
+    var distToLast = Math.sqrt(Math.pow(curvePoints[curvePoints.length - 1][0] - endX, 2) + Math.pow(curvePoints[curvePoints.length - 1][1] - endY, 2));
     
     var dx, dy;
-    if (isFirstEndpoint && curvePoints.length >= 2) {
+    if (distToFirst < ENDPOINT_MATCH_TOLERANCE && curvePoints.length >= 2) {
       dx = curvePoints[0][0] - curvePoints[1][0];
       dy = curvePoints[0][1] - curvePoints[1][1];
-    } else if (isLastEndpoint && curvePoints.length >= 2) {
+    } else if (distToLast < ENDPOINT_MATCH_TOLERANCE && curvePoints.length >= 2) {
       dx = curvePoints[curvePoints.length - 1][0] - curvePoints[curvePoints.length - 2][0];
       dy = curvePoints[curvePoints.length - 1][1] - curvePoints[curvePoints.length - 2][1];
     } else {
-      return 0;
+      if (distToFirst < distToLast && curvePoints.length >= 2) {
+        dx = curvePoints[0][0] - curvePoints[1][0];
+        dy = curvePoints[0][1] - curvePoints[1][1];
+      } else if (curvePoints.length >= 2) {
+        dx = curvePoints[curvePoints.length - 1][0] - curvePoints[curvePoints.length - 2][0];
+        dy = curvePoints[curvePoints.length - 1][1] - curvePoints[curvePoints.length - 2][1];
+      } else {
+        return 0;
+      }
     }
     
     var angle = Math.atan2(dy, dx) * (180 / Math.PI);
