@@ -820,9 +820,13 @@ function createRouteLayer(core) {
 
   // DM4_HELPER_FUNCTION: Handle route hover
   function handleRouteHover(e) {
-    var rect = svg.getBoundingClientRect();
-    var svgX = e.clientX - rect.left;
-    var svgY = e.clientY - rect.top;
+    // Find the map container element
+    var mapContainer = svg.closest('.dm-map-container');
+    if (!mapContainer) return;
+    
+    var rect = mapContainer.getBoundingClientRect();
+    var containerX = e.clientX - rect.left;
+    var containerY = e.clientY - rect.top;
     
     // Find viewport element to get transform
     var viewport = svg.parentElement;
@@ -836,9 +840,11 @@ function createRouteLayer(core) {
     var translateY = translateMatch ? parseFloat(translateMatch[2]) : 0;
     var scale = scaleMatch ? parseFloat(scaleMatch[1]) : 1;
     
-    // Convert screen coordinates to world coordinates
-    var worldX = (svgX - translateX) / scale;
-    var worldY = (svgY - translateY) / scale;
+    // Convert container coordinates to world coordinates
+    // containerX = worldX * scale + translateX
+    // Therefore: worldX = (containerX - translateX) / scale
+    var worldX = (containerX - translateX) / scale;
+    var worldY = (containerY - translateY) / scale;
     
     var closestRoute = null;
     var closestDistance = Infinity;
