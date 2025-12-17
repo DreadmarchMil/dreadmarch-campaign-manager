@@ -532,7 +532,7 @@
         if (selectionChanged) {
           lastSelectionId = selId;
         }
-      }, ['selection', 'dataset']); // Scoped subscription - only listen to selection and dataset changes
+      }, ['selection']); // Scoped subscription - listen to selection changes
 
       return {
         mount: function (host) {
