@@ -840,9 +840,9 @@ function createRouteLayer(core) {
     var translateY = translateMatch ? parseFloat(translateMatch[2]) : 0;
     var scale = scaleMatch ? parseFloat(scaleMatch[1]) : 1;
     
-    // Convert container coordinates to world coordinates
-    // containerX = worldX * scale + translateX
-    // Therefore: worldX = (containerX - translateX) / scale
+    // Convert container coordinates to world coordinates (inverse transform)
+    // Forward transform: screenX = worldX * scale + translateX
+    // Inverse transform: worldX = (screenX - translateX) / scale
     var worldX = (containerX - translateX) / scale;
     var worldY = (containerY - translateY) / scale;
     
