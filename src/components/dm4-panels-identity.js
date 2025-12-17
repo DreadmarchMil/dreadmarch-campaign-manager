@@ -540,6 +540,11 @@
           const st = state.getState();
           renderIdentity(st);
           renderNavcom(st);
+          // Synchronize memoization cache with initial render state to prevent 
+          // duplicate renders when subscription fires
+          lastSelectionId = st.selection && st.selection.system;
+          lastDatasetVersion = st.dataset && st.dataset.dataset_metadata && st.dataset.dataset_metadata.version;
+          cachedNavcomData = { selId: lastSelectionId, datasetVersion: lastDatasetVersion };
         },
         unmount: function () {
           unsubscribe();
