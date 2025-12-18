@@ -22,6 +22,10 @@
   --route-medium-width: 1.7;
   --route-minor-width: 1;
 
+  /* Selection colors */
+  --selection-color: #e46b24;
+  --selection-glow-color: #e46b24;
+
   --system-fill-color: #cd3e3e;
   --system-stroke-color: #000000;
   --label-color: #e6d2c8;

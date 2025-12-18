@@ -1667,35 +1667,6 @@ function EditorPanel(core) {
       addSegTitle.textContent = "Add Segment:";
       container.appendChild(addSegTitle);
       
-      // Position selector row
-      var positionRow = document.createElement("div");
-      positionRow.classList.add("dm4-editor-line", "dm-text-body");
-      positionRow.textContent = "Position: ";
-      
-      var positionSelect = document.createElement("select");
-      positionSelect.classList.add("dm4-editor-select");
-      
-      var endOpt = document.createElement("option");
-      endOpt.value = "end";
-      endOpt.textContent = "End";
-      positionSelect.appendChild(endOpt);
-      
-      var startOpt = document.createElement("option");
-      startOpt.value = "start";
-      startOpt.textContent = "Start";
-      positionSelect.appendChild(startOpt);
-      
-      // Add "After segment N" options
-      segments.forEach(function(seg, idx) {
-        var afterOpt = document.createElement("option");
-        afterOpt.value = "after-" + idx;
-        afterOpt.textContent = "After segment " + (idx + 1) + " (" + seg[0] + " ↔ " + seg[1] + ")";
-        positionSelect.appendChild(afterOpt);
-      });
-      
-      positionRow.appendChild(positionSelect);
-      container.appendChild(positionRow);
-      
       var addSegRow = document.createElement("div");
       addSegRow.classList.add("dm4-editor-line", "dm-text-body");
       
@@ -1732,20 +1703,11 @@ function EditorPanel(core) {
       
       var addSegBtn = document.createElement("button");
       addSegBtn.type = "button";
-      addSegBtn.textContent = "Add";
+      addSegBtn.textContent = "Add to End";
       addSegBtn.classList.add("dm4-editor-button");
       addSegBtn.addEventListener("click", function() {
         if (fromSelect.value && toSelect.value && fromSelect.value !== toSelect.value) {
           var datasetId = getCurrentDatasetId();
-          var position = positionSelect.value;
-          var insertIndex = -1; // -1 means end
-          
-          if (position === "start") {
-            insertIndex = 0;
-          } else if (position.indexOf("after-") === 0) {
-            var afterIdx = parseInt(position.substring(6), 10);
-            insertIndex = afterIdx + 1;
-          }
           
           state.actions.addEditorJob({
             target_dataset: datasetId,
@@ -1753,8 +1715,7 @@ function EditorPanel(core) {
             payload: { 
               route_name: routeName, 
               from_system: fromSelect.value, 
-              to_system: toSelect.value,
-              insert_index: insertIndex
+              to_system: toSelect.value
             },
             created_at: new Date().toISOString()
           });

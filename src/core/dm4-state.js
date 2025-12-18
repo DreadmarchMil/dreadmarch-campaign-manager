@@ -67,10 +67,14 @@
     // Array of subscriber objects, each containing a callback function and scope path
     let subscribers = [];
 
+    // Dataset version counter for tracking changes
+    var datasetVersion = 0;
+
     // Central state object - all application state lives here
     let state = {
       config: config || {},
       dataset: dataset || { systems: {} },
+      datasetVersion: datasetVersion,
       campaign: campaign || {
         factions: [],
         systemControl: [],
@@ -329,8 +333,10 @@
        * @param {Object} newDataset - New dataset object (must include systems property)
        */
       setDataset: function (newDataset) {
+        datasetVersion++;
         state = Object.assign({}, state, {
-          dataset: newDataset || { systems: {} }
+          dataset: newDataset || { systems: {} },
+          datasetVersion: datasetVersion
         });
         batchNotify(['dataset']);
       },
