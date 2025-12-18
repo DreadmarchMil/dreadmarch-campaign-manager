@@ -97,7 +97,9 @@
       mode: "navcom",
       editor: {
         enabled: false,
-        jobs: []
+        jobs: [],
+        mode: null,
+        pendingData: null
       }
     };
 
@@ -410,6 +412,39 @@
         const current = state.editor || { enabled: false, jobs: [] };
         state = Object.assign({}, state, {
           editor: Object.assign({}, current, { jobs: [] })
+        });
+        batchNotify(['editor']);
+      },
+
+      /**
+       * setEditorMode - Sets the current editor interaction mode
+       * 
+       * Editor modes control how map interactions behave (e.g., clicking to add systems,
+       * moving systems, adding route segments). When a mode is active, map clicks
+       * are intercepted to perform the mode-specific action.
+       * 
+       * Valid modes: 'add_system', 'move_system', 'add_segment', null
+       * 
+       * @param {string|null} mode - The editor mode to activate, or null to clear
+       * @param {Object} data - Optional data associated with the mode (e.g., selected route for add_segment)
+       */
+      setEditorMode: function (mode, data) {
+        const current = state.editor || { enabled: false, jobs: [], mode: null, pendingData: null };
+        state = Object.assign({}, state, {
+          editor: Object.assign({}, current, { mode: mode, pendingData: data || null })
+        });
+        batchNotify(['editor']);
+      },
+
+      /**
+       * clearEditorMode - Clears the current editor interaction mode
+       * 
+       * Resets editor mode back to null and clears any pending mode data.
+       */
+      clearEditorMode: function () {
+        const current = state.editor || { enabled: false, jobs: [], mode: null, pendingData: null };
+        state = Object.assign({}, state, {
+          editor: Object.assign({}, current, { mode: null, pendingData: null })
         });
         batchNotify(['editor']);
       }
