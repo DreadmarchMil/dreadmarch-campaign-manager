@@ -520,6 +520,15 @@
   background: rgba(226, 58, 58, 0.3);
 }
 
+.dm4-filterable-no-match {
+  color: var(--dm-color-muted);
+  cursor: default;
+}
+
+.dm4-filterable-no-match:hover {
+  background: transparent;
+}
+
 .dm4-filterable-dropdown::-webkit-scrollbar {
   width: 8px;
 }

@@ -869,8 +869,6 @@ function EditorPanel(core) {
     function createFilterableSelect(options, defaultText) {
       var container = document.createElement("div");
       container.classList.add("dm4-filterable-select");
-      container.style.position = "relative";
-      container.style.display = "inline-block";
       
       var input = document.createElement("input");
       input.type = "text";
@@ -881,18 +879,10 @@ function EditorPanel(core) {
       var dropdown = document.createElement("div");
       dropdown.classList.add("dm4-filterable-dropdown");
       dropdown.style.display = "none";
-      dropdown.style.position = "absolute";
-      dropdown.style.top = "100%";
-      dropdown.style.left = "0";
-      dropdown.style.right = "0";
-      dropdown.style.maxHeight = "200px";
-      dropdown.style.overflowY = "auto";
-      dropdown.style.background = "rgba(10, 5, 5, 0.95)";
-      dropdown.style.border = "1px solid var(--dm-color-muted)";
-      dropdown.style.zIndex = "1000";
       
       var selectedValue = "";
       var allOptions = options || [];
+      var DROPDOWN_CLOSE_DELAY = 200;
       
       function renderOptions(filter) {
         dropdown.innerHTML = "";
@@ -903,10 +893,8 @@ function EditorPanel(core) {
         
         if (matchedOptions.length === 0) {
           var noMatch = document.createElement("div");
-          noMatch.classList.add("dm4-filterable-option");
+          noMatch.classList.add("dm4-filterable-option", "dm4-filterable-no-match");
           noMatch.textContent = "No matches";
-          noMatch.style.padding = "4px 8px";
-          noMatch.style.color = "var(--dm-color-muted)";
           dropdown.appendChild(noMatch);
           return;
         }
@@ -915,17 +903,6 @@ function EditorPanel(core) {
           var option = document.createElement("div");
           option.classList.add("dm4-filterable-option");
           option.textContent = opt;
-          option.style.padding = "4px 8px";
-          option.style.cursor = "pointer";
-          option.style.color = "var(--dm-color-body)";
-          
-          option.addEventListener("mouseenter", function() {
-            option.style.background = "rgba(226, 58, 58, 0.3)";
-          });
-          
-          option.addEventListener("mouseleave", function() {
-            option.style.background = "transparent";
-          });
           
           option.addEventListener("click", function() {
             selectedValue = opt;
@@ -950,7 +927,7 @@ function EditorPanel(core) {
       input.addEventListener("blur", function() {
         setTimeout(function() {
           dropdown.style.display = "none";
-        }, 200);
+        }, DROPDOWN_CLOSE_DELAY);
       });
       
       container.appendChild(input);
