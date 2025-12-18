@@ -633,6 +633,15 @@ function createRouteLayer(core) {
   const allLines = [];
   const linesBySystem = new Map();
 
+  // Route hover detection and labeling variables
+  var routeHoverData = [];
+  var currentHoveredRoute = null;
+  var HOVER_PROXIMITY_THRESHOLD = 50;
+  var HOVER_DWELL_TIME = 350; // ms before hover activates
+  var hoverDelayTimer = null;
+  var pendingHoverRoute = null;
+  var routeHoverTooltip = null; // Fixed tooltip element
+
   // DM4_HELPER_FUNCTION: registerLine
 
   function registerLine(line, from, to) {
