@@ -1199,6 +1199,14 @@ function initMapLayer(core, root) {
   }
   window.addEventListener("resize", handleResize);
 
+  // Panning variables
+  var isPanning = false;
+  var hasDragged = false;
+  var startX = 0;
+  var startY = 0;
+  var startTX = 0;
+  var startTY = 0;
+
   // Update cursor based on editor mode
   function updateCursorForEditorMode() {
     var st = core.state.getState();
@@ -1220,13 +1228,7 @@ function initMapLayer(core, root) {
   // Initial cursor update
   updateCursorForEditorMode();
 
-  // Panning
-  let isPanning = false;
-  let hasDragged = false;
-  let startX = 0;
-  let startY = 0;
-  let startTX = 0;
-  let startTY = 0;
+  // Panning event handlers
 
   mapContainer.addEventListener("mousedown", function (e) {
     if (e.button !== 0) return;
