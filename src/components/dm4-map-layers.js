@@ -78,7 +78,7 @@
 
     const markerById = new Map();
     let unsubscribe = null;
-    let lastDataset = null;
+    var lastDatasetVersion = -1;
 
     // DM4_HELPER_FUNCTION: buildMarkers
 
@@ -197,13 +197,13 @@
     }
 
     buildMarkers(core.state.getState().dataset);
-    lastDataset = core.state.getState().dataset;
+    lastDatasetVersion = core.state.getState().datasetVersion;
 
     // Use scoped subscription - listen to selection and dataset changes
     unsubscribe = state.subscribe(function (st) {
-      // Check if dataset changed
-      if (st.dataset !== lastDataset) {
-        lastDataset = st.dataset;
+      // Check if dataset version changed
+      if (st.datasetVersion !== lastDatasetVersion) {
+        lastDatasetVersion = st.datasetVersion;
         buildMarkers(st.dataset);
       }
       renderSelection(st);
@@ -226,7 +226,7 @@ function createSystemLabelsLayer(core) {
 
   const labelById = new Map();
   let unsubscribe = null;
-  let lastDataset = null;
+  var lastDatasetVersion = -1;
 
   // DM4_HELPER_FUNCTION: buildLabels
 
@@ -293,13 +293,13 @@ function createSystemLabelsLayer(core) {
   }
 
   buildLabels(state.getState().dataset);
-  lastDataset = state.getState().dataset;
+  lastDatasetVersion = state.getState().datasetVersion;
   
   // Use scoped subscription - listen to selection and dataset changes
   unsubscribe = state.subscribe(function (st) {
-    // Check if dataset changed
-    if (st.dataset !== lastDataset) {
-      lastDataset = st.dataset;
+    // Check if dataset version changed
+    if (st.datasetVersion !== lastDatasetVersion) {
+      lastDatasetVersion = st.datasetVersion;
       buildLabels(st.dataset);
     }
     renderSelection(st);
@@ -417,7 +417,7 @@ function createRouteLayer(core) {
   const height = config.mapHeight || 6000;
 
   const state = core.state;
-  let lastDataset = null;
+  var lastDatasetVersion = -1;
   
   var dataset = state.getState().dataset || {};
   var hyperlanes = dataset.hyperlanes || {};
@@ -1058,9 +1058,9 @@ function createRouteLayer(core) {
 
   // Use scoped subscription - listen to selection and dataset changes
   const unsubscribe = state.subscribe(function (st) {
-    // Check if dataset changed
-    if (st.dataset !== lastDataset) {
-      lastDataset = st.dataset;
+    // Check if dataset version changed
+    if (st.datasetVersion !== lastDatasetVersion) {
+      lastDatasetVersion = st.datasetVersion;
       buildRoutes(st.dataset);
       // Re-attach hover listener after rebuild
       attachHoverListener();

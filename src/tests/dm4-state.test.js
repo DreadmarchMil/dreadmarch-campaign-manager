@@ -295,6 +295,41 @@ describe('DM4 State Manager', () => {
       const state = stateManager.getState();
       expect(state.dataset).toEqual({ systems: {} });
     });
+
+    test('should increment datasetVersion on each setDataset call', () => {
+      const stateManager = DM4.state.createStateManager();
+      const initialState = stateManager.getState();
+      const initialVersion = initialState.datasetVersion;
+
+      const dataset1 = { systems: { 'sol': { name: 'Sol' } } };
+      stateManager.actions.setDataset(dataset1);
+      const state1 = stateManager.getState();
+      expect(state1.datasetVersion).toBe(initialVersion + 1);
+
+      const dataset2 = { systems: { 'alpha': { name: 'Alpha' } } };
+      stateManager.actions.setDataset(dataset2);
+      const state2 = stateManager.getState();
+      expect(state2.datasetVersion).toBe(initialVersion + 2);
+    });
+
+    test('should notify subscribers with new datasetVersion', (done) => {
+      const stateManager = DM4.state.createStateManager();
+      const mockSubscriber = jest.fn();
+
+      stateManager.subscribe(mockSubscriber, ['dataset']);
+      mockSubscriber.mockClear();
+
+      const newDataset = { systems: { 'sol': { name: 'Sol' } } };
+      stateManager.actions.setDataset(newDataset);
+
+      setTimeout(() => {
+        expect(mockSubscriber).toHaveBeenCalledTimes(1);
+        const calledState = mockSubscriber.mock.calls[0][0];
+        expect(calledState.dataset).toEqual(newDataset);
+        expect(calledState.datasetVersion).toBeGreaterThan(0);
+        done();
+      }, 20);
+    });
   });
 
   describe('Actions - setCampaign', () => {
